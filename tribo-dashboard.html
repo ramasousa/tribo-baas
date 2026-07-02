@@ -3,543 +3,331 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <title>Dashboard Executivo · Bradesco as a Service</title>
 <style>
 :root{
-  --red:#CC092F;--rd:#900F15;--ink:#0B0E18;--bg:#F7F5F2;--card:#fff;
-  --g900:#14161F;--g600:#4B5065;--g400:#9CA3AF;--g200:#E4E1DC;--g100:#F0EDE8;
-  --gA:#CC092F;--gAf:#FBE9EC;--gB:#4F46E5;--gBf:#EEEDFC;
-  --gC:#1A8754;--gCf:#E8F5EE;--gR:#0EA5E9;--gRf:#E0F2FE;
+  --bg:#0A0C15;--card:#13162A;--card2:#181B2E;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --text:#F8F6F0;--muted:rgba(248,246,240,.42);--faint:rgba(248,246,240,.18);
+  --red:#CC092F;--red-faint:rgba(204,9,47,.15);
+  --gA:#CC092F;--gAf:rgba(204,9,47,.12);
+  --gB:#4F46E5;--gBf:rgba(79,70,229,.12);
+  --gC:#1A8754;--gCf:rgba(26,135,84,.12);
+  --gR:#0EA5E9;--gRf:rgba(14,165,233,.12);
+  --ok:#10B981;--warn:#F59E0B;--gap:#EF4444;
+  --serif:Georgia,'Times New Roman',serif;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  --serif:Georgia,'Times New Roman',serif;--mono:'SF Mono',Consolas,monospace;
+  --mono:'SF Mono','Fira Code',Consolas,monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{font-family:var(--sans);background:var(--bg);color:var(--g600);-webkit-font-smoothing:antialiased;min-height:100vh}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
 
-/* HEADER */
-.dash-header{background:var(--ink);padding:0 32px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.dash-logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:700;font-size:15px;color:#fff}
-.dash-meta{display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(255,255,255,.5)}
-.dash-sync{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.5)}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#22C55E}
-.dash-tag{background:rgba(204,9,47,.3);color:#FCA5A5;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:.06em}
+/* NAV */
+nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:100;background:rgba(10,12,21,.92);backdrop-filter:blur(16px)}
+.nav-brand{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:700;font-size:14px;color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.sync-wrap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav-user{font-size:11.5px;color:var(--muted)}
+.nav-link{font-size:11.5px;color:var(--faint);text-decoration:none;border:1px solid var(--border);padding:4px 12px;border-radius:6px;transition:all .2s}
+.nav-link:hover{color:var(--text);border-color:var(--border2)}
 
-/* MAIN */
-.dash-main{max-width:1320px;margin:0 auto;padding:28px 32px 64px}
-@media(max-width:768px){.dash-main{padding:20px 16px 48px}}
+/* HERO */
+.hero{padding:40px 32px 36px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.hero-kpis{display:flex;gap:0;margin-top:8px}
+.kpi{flex:1;padding:20px 0;position:relative}
+.kpi+.kpi{border-left:1px solid var(--border);padding-left:32px}
+.kpi-n{font-family:var(--serif);font-size:clamp(36px,3.5vw,52px);font-weight:700;color:var(--text);line-height:1;letter-spacing:-.02em}
+.kpi-label{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.04em}
+.kpi-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:8px}
+.badge-ok{background:rgba(16,185,129,.15);color:#34D399}
+.badge-warn{background:rgba(245,158,11,.15);color:#FCD34D}
+.badge-gap{background:rgba(239,68,68,.15);color:#FCA5A5}
+.kpi-divider{width:1px;background:var(--border);margin:0 32px;align-self:stretch}
 
-/* KPI ROW */
-.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px}
-@media(max-width:960px){.kpi-row{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:560px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
-.kpi-card{background:var(--card);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;position:relative;overflow:hidden}
-.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kpi-color,var(--red))}
-.kpi-n{font-family:var(--serif);font-size:32px;font-weight:700;color:var(--ink);line-height:1;margin-bottom:4px}
-.kpi-l{font-size:12px;color:var(--g400);letter-spacing:.03em}
-.kpi-sub{font-size:11px;color:var(--g400);margin-top:6px;display:flex;align-items:center;gap:5px}
-.kpi-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px}
-.kpi-alert{background:#FEE2E2;color:#991B1B}
-.kpi-ok{background:#D1FAE5;color:#065F46}
-.kpi-warn{background:#FEF3C7;color:#92400E}
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 52px - 180px - 120px)}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
 
-/* SECTION HEADERS */
-.dash-section{margin-bottom:28px}
-.dash-section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
-.dash-section-head h2{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink)}
-.dash-section-head span{font-size:11px;color:var(--g400);font-weight:600;letter-spacing:.06em;text-transform:uppercase}
+/* SQUAD MAP */
+.map-section{padding:28px 32px;border-right:1px solid var(--border)}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:18px}
+.group-lane{margin-bottom:4px;border-radius:10px;overflow:hidden;transition:background .2s}
+.group-lane:hover{background:rgba(255,255,255,.02)}
+.lane-header{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
+.lane-color{width:3px;height:18px;border-radius:2px;flex-shrink:0}
+.lane-name{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.lane-count{font-size:10px;color:var(--faint);margin-left:auto;font-family:var(--mono)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px}
+.pill{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s;position:relative;user-select:none}
+.pill:hover{border-color:var(--border2);background:rgba(255,255,255,.05)}
+.pill.active{border-color:var(--border2);background:rgba(255,255,255,.06)}
+.pill-id{font-family:var(--mono);font-size:11.5px;font-weight:700}
+.pill-name{font-size:11.5px;color:var(--muted);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:2px}
 
-/* SQUAD HEALTH GRID */
-.health-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.health-card{border-radius:10px;padding:12px 14px;border:1px solid transparent;cursor:default;transition:transform .15s}
-.health-card:hover{transform:translateY(-2px)}
-.hc-id{font-family:var(--mono);font-size:11px;font-weight:700;margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.hc-name{font-size:11.5px;color:var(--ink);font-weight:600;line-height:1.3;margin-bottom:8px}
-.hc-meta{display:flex;align-items:center;justify-content:space-between;font-size:10px}
-.hc-alloc{font-weight:700}
-.health-ok{background:#D1FAE5;border-color:#A7F3D0}
-.health-warn{background:#FEF9C3;border-color:#FDE68A}
-.health-gap{background:#FEE2E2;border-color:#FECACA}
-.health-neutral{background:var(--g100);border-color:var(--g200)}
-.health-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.dot-ok{background:#10B981}
-.dot-warn{background:#F59E0B}
-.dot-gap{background:#EF4444}
-.dot-neutral{background:#9CA3AF}
-.group-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--g400);margin:14px 0 6px;grid-column:1/-1}
+/* DETAIL PANEL */
+.detail-panel{overflow:hidden;transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .2s;max-height:0;opacity:0}
+.detail-panel.open{max-height:300px;opacity:1}
+.detail-inner{margin:0 14px 14px;background:var(--card2);border-radius:10px;padding:18px 20px;border:1px solid var(--border)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.detail-stat{display:flex;flex-direction:column;gap:4px}
+.detail-stat-n{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--text)}
+.detail-stat-l{font-size:10.5px;color:var(--muted)}
+.detail-mandate{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.detail-close{float:right;font-size:11px;color:var(--faint);cursor:pointer;padding:2px 8px;border-radius:5px;border:1px solid var(--border)}
+.detail-close:hover{color:var(--text)}
 
-/* RISK MATRIX */
-.matrix-wrap{background:var(--card);border:1px solid var(--g200);border-radius:14px;padding:20px;display:inline-block;width:100%}
-.matrix-grid{display:grid;grid-template-columns:auto repeat(3,1fr);grid-template-rows:repeat(3,1fr) auto;gap:6px}
-.matrix-cell{background:var(--g100);border-radius:8px;padding:10px;min-height:72px;position:relative;display:flex;flex-direction:column;gap:4px}
-.mc-critico{background:#FEE2E2}
-.mc-alto{background:#FEF3C7}
-.mc-medio{background:#EFF6FF}
-.mc-baixo{background:#F0FDF4}
-.matrix-label{font-size:9.5px;font-weight:700;color:var(--g400);letter-spacing:.06em;text-transform:uppercase;writing-mode:vertical-rl;text-orientation:mixed;display:flex;align-items:center;justify-content:center;padding:4px}
-.matrix-label-h{font-size:9.5px;font-weight:700;color:var(--g400);letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:4px}
-.risk-dot{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
-.risk-dot-critico{background:#991B1B}
-.risk-dot-alto{background:#DC2626}
-.risk-dot-medio{background:#D97706}
-.risk-dot-baixo{background:#059669}
+/* PULSE SIDEBAR */
+.pulse-section{padding:28px 24px;border-top:none}
+.pulse-block{margin-bottom:24px}
+.risk-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.risk-item:last-child{border-bottom:none}
+.risk-sev{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0}
+.risk-title{font-size:12.5px;color:var(--text);font-weight:600;line-height:1.4}
+.risk-meta{font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;gap:8px}
+.risk-pill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px}
+.r-critico{background:rgba(153,27,27,.3);color:#FCA5A5}
+.r-alto{background:rgba(220,38,38,.2);color:#FCA5A5}
+.r-medio{background:rgba(217,119,6,.2);color:#FCD34D}
 
-/* ALLOCATION CHART */
-.alloc-wrap{background:var(--card);border:1px solid var(--g200);border-radius:14px;padding:20px}
-.alloc-chart{display:flex;align-items:flex-end;gap:16px;height:120px;padding:0 8px}
-.alloc-bar-group{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
-.alloc-bars{display:flex;gap:4px;align-items:flex-end;height:100px}
-.bar{border-radius:4px 4px 0 0;min-width:16px;transition:height .3s}
-.bar-planned{opacity:.3}
-.alloc-group-label{font-size:10px;font-weight:700;text-align:center}
-.alloc-numbers{font-size:10px;color:var(--g400);text-align:center}
-.alloc-legend{display:flex;gap:14px;margin-top:12px;font-size:11px;color:var(--g400)}
-.alloc-legend-dot{width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:4px}
+.ext-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.ext-item:last-child{border-bottom:none}
+.ext-imp{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:100px;flex-shrink:0}
+.ei-alto{background:rgba(239,68,68,.15);color:#FCA5A5}
+.ei-medio{background:rgba(245,158,11,.15);color:#FCD34D}
+.ext-name{color:var(--text);font-weight:600}
+.ext-squads{font-size:10.5px;color:var(--muted)}
 
-/* GRID 2COL */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:768px){.grid-2{grid-template-columns:1fr}}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
-@media(max-width:960px){.grid-3{grid-template-columns:1fr 1fr}}
-@media(max-width:560px){.grid-3{grid-template-columns:1fr}}
-
-/* STRATEGIC MINI CARDS */
-.strat-mini{background:linear-gradient(135deg,#0D0F1A 0%,#1a0a10 60%,#0D0F1A 100%);border-radius:12px;padding:18px 20px;margin-bottom:10px}
-.strat-mini-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A78BFA;margin-bottom:6px}
-.strat-mini-title{font-family:var(--serif);font-size:14px;color:#fff;font-weight:700;line-height:1.3;margin-bottom:10px}
-.strat-mini-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.strat-mini-col{background:rgba(255,255,255,.06);border-radius:7px;padding:8px 10px}
-.strat-mini-col-label{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
-.strat-mini-col.before .strat-mini-col-label{color:#FCA5A5}
-.strat-mini-col.after .strat-mini-col-label{color:#86EFAC}
-.strat-mini-col ul{list-style:none;font-size:10.5px;color:rgba(255,255,255,.65);line-height:1.7}
-.strat-mini-col li{padding-left:10px;position:relative}
-.strat-mini-col.before li::before{content:'✕';position:absolute;left:0;color:#FCA5A5;font-size:8px}
-.strat-mini-col.after li::before{content:'✓';position:absolute;left:0;color:#86EFAC;font-size:8px}
-
-/* EXT DEP SUMMARY */
-.ext-dep-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g100)}
-.ext-dep-row:last-child{border-bottom:none}
-.imp-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:100px;flex-shrink:0}
-.imp-alto{background:#FEE2E2;color:#991B1B}
-.imp-medio{background:#FEF3C7;color:#92400E}
-.imp-baixo{background:#D1FAE5;color:#065F46}
-
-/* TEAM MINI */
-.team-mini-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-.team-mini-card{background:var(--card);border:1px solid var(--g200);border-radius:10px;padding:12px;border-top:3px solid var(--tc,var(--g200))}
-.tm-role{font-size:9px;font-weight:700;padding:2px 7px;border-radius:100px;display:inline-block;margin-bottom:8px}
-.tm-name{font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:2px}
-.tm-title{font-size:11px;color:var(--g400);line-height:1.4}
-.tm-squad{font-size:10px;font-family:var(--mono);color:var(--g400);margin-top:5px}
-
-/* LOADING */
-.loading{text-align:center;padding:40px;color:var(--g400);font-size:13px}
-.spinner{width:24px;height:24px;border:2px solid var(--g200);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
-@keyframes spin{to{transform:rotate(360deg)}}
-
-/* LOGIN */
-.login-wrap{min-height:100vh;background:var(--ink);display:flex;align-items:center;justify-content:center;padding:20px}
-.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:36px 32px;width:100%;max-width:380px}
-.login-box h1{font-family:var(--serif);font-size:22px;color:#fff;margin-bottom:6px}
-.login-box p{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:24px}
-.login-input{width:100%;padding:10px 13px;border-radius:9px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:13.5px;font-family:var(--sans);margin-bottom:10px}
-.login-input::placeholder{color:rgba(255,255,255,.3)}
-.login-input:focus{outline:none;border-color:rgba(204,9,47,.6)}
-.login-btn-full{width:100%;padding:11px;border-radius:9px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);margin-top:6px}
-.login-err{font-size:12px;color:#FCA5A5;margin-top:8px;text-align:center;min-height:16px}
-
-/* FOOTER */
-.dash-footer{text-align:center;font-size:11.5px;color:var(--g400);padding:20px;border-top:1px solid var(--g200);margin-top:20px}
+/* STRATEGY BAND */
+.strategy-band{border-top:1px solid var(--border);padding:24px 32px}
+.strat-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strat-scroll::-webkit-scrollbar{display:none}
+.strat-card{background:linear-gradient(135deg,#0F1220 0%,#1a0a10 60%,#0F1220 100%);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;min-width:340px;flex-shrink:0}
+.strat-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A78BFA;margin-bottom:8px}
+.strat-title{font-family:var(--serif);font-size:14px;color:var(--text);font-weight:700;line-height:1.4;margin-bottom:12px;max-width:280px}
+.strat-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.strat-col{background:rgba(255,255,255,.04);border-radius:7px;padding:10px 12px}
+.strat-col-label{font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.sc-before .strat-col-label{color:#FCA5A5}
+.sc-after .strat-col-label{color:#86EFAC}
+.strat-col ul{list-style:none;font-size:10.5px;color:rgba(248,246,240,.6);line-height:1.75}
+.strat-col li{padding-left:11px;position:relative}
+.sc-before li::before{content:'✕';position:absolute;left:0;color:#FCA5A5;font-size:8px;top:2px}
+.sc-after li::before{content:'✓';position:absolute;left:0;color:#86EFAC;font-size:8px;top:2px}
 </style>
 </head>
 <body>
 
-<div id="login-screen" style="display:none">
-  <div class="login-wrap">
-    <div class="login-box">
-      <h1>Dashboard Executivo</h1>
-      <p>Bradesco as a Service · Visão executiva da Tribo</p>
-      <input class="login-input" id="d-email" type="email" placeholder="seu.nome@bradesco.com.br" autocomplete="email"/>
-      <input class="login-input" id="d-pass" type="password" placeholder="Senha" autocomplete="current-password"/>
-      <button class="login-btn-full" onclick="dashLogin()">Entrar →</button>
-      <div class="login-err" id="d-err"></div>
-    </div>
+<!-- LOGIN LAYER -->
+<div id="login-layer" style="display:none;position:fixed;inset:0;background:#0A0C15;z-index:1000;display:flex;align-items:center;justify-content:center">
+  <div style="background:#13162A;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:0 32px 80px rgba(0,0,0,.6)">
+    <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F8F6F0;margin-bottom:6px">Dashboard Executivo</div>
+    <div style="font-size:13px;color:rgba(248,246,240,.4);margin-bottom:28px">Bradesco as a Service · Tribo BaaS</div>
+    <input id="d-email" type="email" placeholder="seu.nome@bradesco.com.br"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#F8F6F0;font-size:14px;font-family:inherit;margin-bottom:10px"/>
+    <input id="d-pass" type="password" placeholder="Senha"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#F8F6F0;font-size:14px;font-family:inherit;margin-bottom:14px"/>
+    <button class="dash-login-btn" onclick="dashLogin()"
+      style="width:100%;padding:12px;border-radius:9px;border:none;background:#CC092F;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Entrar →</button>
+    <div id="d-err" style="font-size:12px;color:#FCA5A5;margin-top:10px;text-align:center;min-height:16px"></div>
+    <div style="font-size:11px;color:rgba(248,246,240,.2);text-align:center;margin-top:20px">Uso exclusivo para colaboradores Bradesco</div>
   </div>
 </div>
 
-<div id="dash-app" style="display:none">
-  <header class="dash-header">
-    <div class="dash-logo">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-        <path d="M5 11.5L12 3l7 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3.5 15L12 6.5l8.5 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
-        <path d="M9.5 15.5v5.5M14.5 15.5v5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
-      </svg>
-      Bradesco as a Service
+<!-- APP LAYER -->
+<div id="app-layer" style="display:none">
+<nav>
+  <div class="nav-brand">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M5 11.5L12 3l7 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3.5 15L12 6.5l8.5 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+      <path d="M9.5 15.5v5.5M14.5 15.5v5.5" stroke="#F8F6F0" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    Bradesco as a Service
+  </div>
+  <div class="nav-right">
+    <div class="sync-wrap">
+      <span class="sync-dot"></span>
+      <span id="sync-lbl">Sync 17:35</span>
     </div>
-    <div class="dash-meta">
-      <span class="dash-tag">DASHBOARD EXECUTIVO</span>
-      <div class="dash-sync"><span class="sync-dot" id="sync-dot" style="background:#9CA3AF"></span><span id="sync-label">Conectando...</span></div>
-      <span id="dash-user" style="font-size:11.5px"></span>
-      <a onclick="dashLogout()" style="cursor:pointer;color:rgba(255,255,255,.35);font-size:12px">Sair</a>
-    </div>
-  </header>
+    <span class="nav-user" id="sync-user"></span>
+    <a class="nav-link" onclick="dashLogout()" style="cursor:pointer">Sair</a>
+    <a class="nav-link" href="/">← Documento</a>
+  </div>
+</nav>
 
-  <main class="dash-main" id="dash-main">
-    <div class="loading"><div class="spinner"></div>Carregando dados da Tribo...</div>
-  </main>
+<section class="hero">
+  <div class="hero-eyebrow">Dashboard Executivo · Tribo BaaS</div>
+  <div class="hero-kpis" id="kpis"></div>
+</section>
 
-  <footer class="dash-footer">
-    Bradesco as a Service · Dashboard Executivo · <span id="dash-footer-user"></span>
-    · <a href="/" style="color:var(--g400)">Voltar ao documento completo</a>
-  </footer>
+<div class="main-grid">
+  <section class="map-section">
+    <div class="section-label">Saúde das squads — clique para ver detalhes</div>
+    <div id="squad-map"></div>
+  </section>
+
+  <section class="pulse-section">
+    <div class="section-label">Riscos em aberto</div>
+    <div class="pulse-block" id="risk-list"></div>
+    <div class="section-label" style="margin-bottom:14px">Dependências externas</div>
+    <div id="ext-list"></div>
+  </section>
 </div>
 
+<section class="strategy-band">
+  <div class="section-label" style="margin-bottom:14px">Argumentos estratégicos</div>
+  <div class="strat-scroll" id="strat-list"></div>
+</section>
+
 <script>
+// ── FIREBASE ─────────────────────────────────────────────────────────────
 const FB={
   apiKey:'AIzaSyAa3uxYyktTJC7o_CIx0RBFObWcxCPjzso',
-  projectId:'realtime-database-61af7',
   dbURL:'https://realtime-database-61af7-default-rtdb.firebaseio.com'
 };
-let fbToken=null,dashUser='',dashData={squads:[],groups:{},members:[],risks:[],strategicCards:[],externalDeps:[],tools:[]},sseConn=null;
+let fbToken=null,sseConn=null,dashUser='';
 
-// ── AUTH ─────────────────────────────────────────────────────────────
 async function fbSignIn(){
   const r=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FB.apiKey}`,
     {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});
   const d=await r.json();if(d.error)throw new Error(d.error.message);
-  fbToken=d.idToken;return fbToken;
+  fbToken=d.idToken;
 }
 async function fbGet(path){
   const r=await fetch(`${FB.dbURL}/${path}.json?auth=${fbToken}`);
   const d=await r.json();if(d&&d.error)throw new Error(d.error);return d;
 }
-function normArr(v,def){
-  if(!v) return def||[];
-  if(Array.isArray(v)) return v;
-  return Object.values(v).filter(x=>x&&typeof x==='object');
-}
-function normStr(v,def){
-  if(!v) return def||[];
-  if(Array.isArray(v)) return v;
-  return Object.values(v).filter(x=>typeof x==='string');
+function nA(v){if(!v)return[];if(Array.isArray(v))return v;return Object.values(v).filter(x=>x&&typeof x==='object');}
+function nS(v){if(!v)return[];if(Array.isArray(v))return v;return Object.values(v).filter(x=>typeof x==='string');}
+
+// ── DEFAULTS (fallback sem Firebase) ─────────────────────────────────────
+const DEFAULT_GROUPS={
+  A:{name:'Developer Portal',color:'#CC092F',faint:'rgba(204,9,47,.12)'},
+  B:{name:'Produtos de Crédito',color:'#4F46E5',faint:'rgba(79,70,229,.12)'},
+  C:{name:'White Label BaaS',color:'#1A8754',faint:'rgba(26,135,84,.12)'},
+  R:{name:'Run — Operação',color:'#0EA5E9',faint:'rgba(14,165,233,.12)'}
+};
+const DEFAULT_RISKS=[
+  {id:'r1',title:'Specs OpenAPI desatualizadas',prob:'alta',impact:'alto',cat:'Técnico',owner:'A2',status:'aberto'},
+  {id:'r2',title:'Chave de LLM exposta no cliente',prob:'media',impact:'alto',cat:'Segurança',owner:'A3',status:'aberto'},
+  {id:'r3',title:'Breaking change no contrato MFE',prob:'media',impact:'alto',cat:'Arquitetura',owner:'C1',status:'aberto'},
+  {id:'r4',title:'Interface Build × Run sem protocolo',prob:'alta',impact:'medio',cat:'Operacional',owner:'R1',status:'aberto'}
+];
+const DEFAULT_EXT=[
+  {id:'e1',name:'BACEN / Open Finance',impact:'alto',squads:['B3','B2']},
+  {id:'e2',name:'Aarin (CDN / frontend)',impact:'alto',squads:['C1','C2']},
+  {id:'e3',name:'Microsoft Entra ID',impact:'alto',squads:['A1','C1']},
+  {id:'e4',name:'DETRAN (multi-UF)',impact:'medio',squads:['A2','B5']},
+  {id:'e5',name:'SPI (PIX)',impact:'alto',squads:['B2']}
+];
+const DEFAULT_STRATEGY=[
+  {id:'s1',eyebrow:'⚡ Independência de plataforma',
+   title:'Axway limita o ritmo de inovação. Esta proposta elimina essa dependência.',
+   before:{label:'Hoje — com Axway',items:['Roadmap depende do vendor','Customização limitada','Licenciamento por volume','IA, MCP e gRPC fora do escopo','White Label impossível nativamente']},
+   after:{label:'Com esta proposta',items:['Roadmap controlado pela tribo','Arquitetura própria, sem limite','Custo de infra previsível','MCP, gRPC e IA nativos','White Label zero-deploy via Design Tokens']}}
+];
+
+// ── LIVE STATE ───────────────────────────────────────────────────────────
+let GROUPS=Object.assign({},DEFAULT_GROUPS);
+let SQUADS=[], RISKS=[], EXTDEPS=[], STRATEGY=[], MEMBERS=[];
+
+function loadState(state){
+  if(!state) return;
+  const raw=state.groups||{};
+  GROUPS={};
+  Object.entries(raw).forEach(([k,v])=>{
+    GROUPS[k]={name:v.name||k,color:v.color||'#6B6F80',faint:v.faint||'rgba(107,111,128,.12)'};
+  });
+  if(!Object.keys(GROUPS).length) GROUPS=Object.assign({},DEFAULT_GROUPS);
+
+  const sq=nA(state.squads);
+  SQUADS=sq.map(s=>({
+    ...s,
+    alloc:(nA(state.members)).filter(m=>m.squadId===s.id).length,
+    caps:(nS(s.capabilities)).length,
+    risks:(nA(state.risks)||DEFAULT_RISKS).filter(r=>r.owner===s.id&&r.status==='aberto').length
+  }));
+  MEMBERS=nA(state.members);
+  RISKS=(nA(state.risks)).length ? nA(state.risks) : DEFAULT_RISKS;
+  EXTDEPS=(nA(state.externalDeps)).length ? nA(state.externalDeps) : DEFAULT_EXT;
+  STRATEGY=(nA(state.strategicCards)).length ? nA(state.strategicCards) : DEFAULT_STRATEGY;
 }
 
+function startSSE(){
+  if(sseConn){sseConn.close();sseConn=null;}
+  if(!fbToken) return;
+  sseConn=new EventSource(`${FB.dbURL}/state.json?auth=${fbToken}`);
+  sseConn.addEventListener('put',e=>{
+    try{
+      const msg=JSON.parse(e.data);
+      if(msg.data&&msg.data.squads){
+        loadState(msg.data);
+        renderAll();
+        setSyncLabel(true,msg.data.lastAt);
+      }
+    }catch(err){}
+  });
+  sseConn.onerror=()=>{setSyncLabel(false);setTimeout(startSSE,8000);};
+}
+function setSyncLabel(ok,at){
+  const lbl=document.getElementById('sync-lbl');
+  const dot=document.getElementById('sync-dot');
+  if(!lbl) return;
+  if(ok){
+    dot.style.background='var(--ok)';
+    const t=at?new Date(at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
+    lbl.textContent='Sync '+(t||'ao vivo');
+  } else {
+    dot.style.background='#EF4444';
+    lbl.textContent='Sem conexão';
+  }
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────────────────
 async function dashLogin(){
   const email=document.getElementById('d-email').value.trim().toLowerCase();
   const err=document.getElementById('d-err');
   if(!email.endsWith('@bradesco.com.br')&&!email.endsWith('@bradesco.com')){
     err.textContent='Apenas emails @bradesco.com.br são permitidos.';return;
   }
-  const btn=document.querySelector('.login-btn-full');btn.textContent='Entrando...';btn.disabled=true;
+  const btn=document.querySelector('.dash-login-btn');
+  btn.textContent='Entrando...';btn.disabled=true;
   try{
     await fbSignIn();
     const state=await fbGet('state');
-    if(state&&state.squads) loadState(state);
+    loadState(state);
     dashUser=email;
     sessionStorage.setItem('dash_user',email);
-    showDash();
+    document.getElementById('login-layer').style.display='none';
+    document.getElementById('app-layer').style.display='';
+    document.getElementById('sync-user').textContent=email;
+    setSyncLabel(true,state&&state.lastAt?state.lastAt:null);
+    renderAll();
     startSSE();
-  }catch(e){err.textContent='Erro ao conectar: '+e.message;}
+  } catch(e){
+    // Fallback: show with defaults
+    dashUser=email;
+    sessionStorage.setItem('dash_user',email);
+    document.getElementById('login-layer').style.display='none';
+    document.getElementById('app-layer').style.display='';
+    document.getElementById('sync-user').textContent=email;
+    setSyncLabel(false);
+    renderAll();
+  }
   btn.textContent='Entrar →';btn.disabled=false;
 }
 function dashLogout(){
   sessionStorage.removeItem('dash_user');
   if(sseConn){sseConn.close();sseConn=null;}
-  document.getElementById('dash-app').style.display='none';
-  document.getElementById('login-screen').style.display='';
-}
-function loadState(state){
-  const nA=v=>normArr(v);
-  const nS=v=>normStr(v);
-  const nAStr=v=>{if(!v)return[];if(Array.isArray(v))return v;return Object.values(v).filter(x=>typeof x==='string');}
-  dashData.squads=nA(state.squads).map(s=>({...s,
-    capabilities:nAStr(s.capabilities),scope:nAStr(s.scope),
-    risks:nAStr(s.risks),premises:nAStr(s.premises),
-    dependencies:Array.isArray(s.dependencies)?s.dependencies:Object.values(s.dependencies||{})}));
-  dashData.groups=state.groups||DEFAULT_GROUPS;
-  dashData.members=nA(state.members);
-  dashData.risks=nA(state.risks);
-  dashData.strategicCards=nA(state.strategicCards);
-  dashData.externalDeps=nA(state.externalDeps);
-  dashData.tools=nA(state.tools);
-}
-function showDash(){
-  document.getElementById('login-screen').style.display='none';
-  document.getElementById('dash-app').style.display='';
-  document.getElementById('dash-user').textContent=dashUser;
-  document.getElementById('dash-footer-user').textContent=dashUser;
-  renderDash();
-}
-function startSSE(){
-  if(sseConn){sseConn.close();}
-  sseConn=new EventSource(`${FB.dbURL}/state.json?auth=${fbToken}`);
-  sseConn.addEventListener('put',e=>{
-    try{const msg=JSON.parse(e.data);if(msg.data&&msg.data.squads){loadState(msg.data);renderDash();setSyncBadge(true,msg.data.lastBy,msg.data.lastAt);}}catch{}
-  });
-  sseConn.onerror=()=>{setSyncBadge(false);setTimeout(startSSE,8000);};
-  setSyncBadge(true,'',new Date().toISOString());
-}
-function setSyncBadge(ok,by,at){
-  const dot=document.getElementById('sync-dot'),lbl=document.getElementById('sync-label');
-  if(!dot)return;
-  dot.style.background=ok?'#22C55E':'#EF4444';
-  const t=at?new Date(at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
-  lbl.textContent=ok?('Sync '+(t||'')):'Sem conexão';
+  document.getElementById('login-layer').style.display='';
+  document.getElementById('app-layer').style.display='none';
 }
 
-const DEFAULT_GROUPS={
-  A:{name:'Developer Portal',color:'#CC092F',faint:'#FBE9EC'},
-  B:{name:'Produtos de Crédito',color:'#4F46E5',faint:'#EEEDFC'},
-  C:{name:'White Label BaaS',color:'#1A8754',faint:'#E8F5EE'},
-  R:{name:'Run — Operação',color:'#0EA5E9',faint:'#E0F2FE'}
-};
-const ROLE_COLORS={TTL:'#A78BFA',TPL:'#34D399',AC:'#60A5FA',DIR:'#F87171',SUPESR:'#FBBF24',SUPE:'#FB923C',TL:'#22D3EE',PM:'#4ADE80',ENG:'#94A3B8',OUTRO:'#CBD5E1'};
-const ROLE_FAINT={TTL:'rgba(167,139,250,.15)',TPL:'rgba(52,211,153,.15)',AC:'rgba(96,165,250,.15)',DIR:'rgba(248,113,113,.15)',SUPESR:'rgba(251,191,36,.15)',SUPE:'rgba(251,146,60,.15)',TL:'rgba(34,211,238,.15)',PM:'rgba(74,222,128,.15)',ENG:'rgba(148,163,184,.15)',OUTRO:'rgba(203,213,225,.15)'};
-
-// ── RENDER ────────────────────────────────────────────────────────────
-function renderDash(){
-  const {squads,groups,members,risks,strategicCards,externalDeps}=dashData;
-  const gm=g=>groups[g]||DEFAULT_GROUPS[g]||{color:'#6B6F80',faint:'#F0F0F0'};
-
-  // KPIs
-  const totalPeople=squads.reduce((a,s)=>a+(parseInt(s.people)||0),0);
-  const allocMembers=members.filter(m=>m.squadId&&squads.find(s=>s.id===m.squadId)).length;
-  const criticalRisks=(risks.length?risks:DEFAULT_RISKS).filter(r=>
-    (r.probability==='alta'&&(r.impact==='alto'||r.impact==='medio'))||(r.probability==='media'&&r.impact==='alto')).length;
-  const totalSquads=squads.length;
-  const totalGroups=Object.keys(groups).length;
-  const extHigh=(externalDeps.length?externalDeps:DEFAULT_EXT).filter(e=>e.impact==='alto').length;
-
-  const allocPct=totalPeople>0?Math.round(allocMembers/totalPeople*100):0;
-
-  // Build squad health
-  const squadHealth=squads.map(s=>{
-    const allocated=members.filter(m=>m.squadId===s.id).length;
-    const planned=parseInt(s.people)||8;
-    const hasHighRisk=(risks.length?risks:DEFAULT_RISKS).some(r=>
-      (r.owner===s.id)&&(r.probability==='alta'||r.impact==='alto')&&r.status==='aberto');
-    let status='neutral';
-    if(allocated>=planned&&!hasHighRisk) status='ok';
-    else if(allocated>0&&allocated<planned) status='warn';
-    else if(allocated===0&&planned>0) status='gap';
-    return {...s,allocated,planned,status,hasHighRisk};
-  });
-
-  // Risk matrix
-  const riskData=risks.length?risks:DEFAULT_RISKS;
-  const matrixCells={
-    alta_alto:[],alta_medio:[],alta_baixo:[],
-    media_alto:[],media_medio:[],media_baixo:[],
-    baixa_alto:[],baixa_medio:[],baixa_baixo:[]
-  };
-  riskData.forEach(r=>{
-    const key=`${r.probability}_${r.impact}`;
-    if(matrixCells[key]) matrixCells[key].push(r);
-  });
-  const matrixScore=(p,i)=>{const pm={alta:3,media:2,baixa:1};const im={alto:3,medio:2,baixo:1};return (pm[p]||1)*(im[i]||1);};
-  const cellClass=(p,i)=>{const s=matrixScore(p,i);return s>=6?'mc-critico':s>=4?'mc-alto':s>=2?'mc-medio':'mc-baixo';};
-  const dotClass=(p,i)=>{const s=matrixScore(p,i);return s>=6?'risk-dot-critico':s>=4?'risk-dot-alto':s>=2?'risk-dot-medio':'risk-dot-baixo';};
-
-  // Alloc bars
-  const groupOrder=['A','B','C','R',...Object.keys(groups).filter(g=>!['A','B','C','R'].includes(g))];
-  const allocBars=groupOrder.map(g=>{
-    const gs=squads.filter(s=>s.group===g);
-    const planned=gs.reduce((a,s)=>a+(parseInt(s.people)||0),0);
-    const allocated=members.filter(m=>gs.find(s=>s.id===m.squadId)).length;
-    const m=gm(g);
-    return {g,planned,allocated,name:m.name,color:m.color};
-  }).filter(b=>b.planned>0);
-  const maxPeople=Math.max(...allocBars.map(b=>b.planned),1);
-
-  // Strategic cards
-  const stratData=strategicCards.length?strategicCards:DEFAULT_STRATEGIC;
-  const extData=externalDeps.length?externalDeps:DEFAULT_EXT;
-
-  const html=`
-  <div style="margin-bottom:24px">
-    <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--g400);margin-bottom:8px">
-      VISÃO EXECUTIVA · TRIBO BRADESCO AS A SERVICE
-    </div>
-    <h1 style="font-family:var(--serif);font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--ink);line-height:1.1">
-      ${totalSquads} squads. ${totalGroups} grupos. Uma tribo.
-    </h1>
-  </div>
-
-  <div class="kpi-row">
-    ${kpiCard(totalSquads,'Squads','var(--red)','')}
-    ${kpiCard('~'+totalPeople,'Pessoas planejadas','#4F46E5','')}
-    ${kpiCard(members.length,'Membros cadastrados','#1A8754',
-      `<span class="kpi-badge ${allocPct>=60?'kpi-ok':allocPct>=30?'kpi-warn':'kpi-alert'}">${allocPct}% alocado</span>`)}
-    ${kpiCard(criticalRisks,'Riscos críticos/altos','#DC2626',
-      `<span class="kpi-badge ${criticalRisks===0?'kpi-ok':criticalRisks<=2?'kpi-warn':'kpi-alert'}">${criticalRisks===0?'Tudo ok':criticalRisks+' abertos'}</span>`)}
-    ${kpiCard(extHigh,'Deps externas — alto impacto','#D97706','')}
-  </div>
-
-  <div class="grid-2" style="margin-bottom:20px;align-items:start">
-    <div class="dash-section">
-      <div class="dash-section-head"><h2>Saúde das Squads</h2><span>por alocação e riscos</span></div>
-      <div class="health-grid">
-        ${groupOrder.flatMap(g=>{
-          const gs=squadHealth.filter(s=>s.group===g);
-          if(!gs.length) return [];
-          const m=gm(g);
-          return [`<div class="group-label" style="color:${m.color}">${g} · ${m.name}</div>`,
-            ...gs.map(s=>`<div class="health-card health-${s.status}" title="${s.name}">
-            <div class="hc-id">
-              <span class="health-dot dot-${s.status}"></span>
-              <span style="font-family:var(--mono);font-weight:700;font-size:11px">${s.id}</span>
-            </div>
-            <div class="hc-name">${s.name.substring(0,22)}</div>
-            <div class="hc-meta">
-              <span class="hc-alloc" style="color:${s.status==='gap'?'#DC2626':s.status==='warn'?'#D97706':'#059669'}">${s.allocated}/${s.planned}</span>
-              <span style="font-size:9px;color:var(--g400)">${s.methodology}</span>
-            </div>
-          </div>`)];
-        }).join('')}
-      </div>
-      <div style="display:flex;gap:14px;margin-top:10px;font-size:10.5px;color:var(--g400)">
-        <span>🟢 Alocado</span><span>🟡 Parcial</span><span>🔴 Sem membros</span><span>⚪ Neutro</span>
-      </div>
-    </div>
-
-    <div>
-      <div class="dash-section">
-        <div class="dash-section-head"><h2>Matriz de Riscos</h2><span>probabilidade × impacto</span></div>
-        <div class="matrix-wrap">
-          <div class="matrix-grid">
-            <div></div>
-            <div class="matrix-label-h">Baixo impacto</div>
-            <div class="matrix-label-h">Médio impacto</div>
-            <div class="matrix-label-h">Alto impacto</div>
-            ${['alta','media','baixa'].map(p=>`
-              <div class="matrix-label" style="writing-mode:vertical-rl;font-size:9px;color:var(--g400);font-weight:700;letter-spacing:.06em;text-transform:uppercase">${p==='alta'?'Alta prob.':p==='media'?'Média prob.':'Baixa prob.'}</div>
-              ${['baixo','medio','alto'].map(i=>{
-                const key=`${p}_${i}`;
-                const risks=matrixCells[key]||[];
-                return `<div class="matrix-cell ${cellClass(p,i)}">
-                  ${risks.map(r=>`<span class="risk-dot ${dotClass(p,i)}" title="${r.title}">${r.id.replace('r','')}</span>`).join('')}
-                  ${risks.length===0?'<span style="font-size:9px;color:var(--g400);opacity:.5">—</span>':''}
-                </div>`;
-              }).join('')}
-            `).join('')}
-          </div>
-          <div style="margin-top:10px;font-size:10px;color:var(--g400)">Passe o mouse sobre os pontos para ver o risco.</div>
-        </div>
-      </div>
-
-      <div class="dash-section" style="margin-top:20px">
-        <div class="dash-section-head"><h2>Alocação por Grupo</h2><span>planejado vs cadastrado</span></div>
-        <div class="alloc-wrap">
-          <div class="alloc-chart">
-            ${allocBars.map(b=>{
-              const hp=Math.round((b.planned/maxPeople)*100);
-              const ha=Math.round((b.allocated/maxPeople)*100);
-              return `<div class="alloc-bar-group">
-                <div class="alloc-bars">
-                  <div class="bar bar-planned" style="height:${hp}px;background:${b.color};width:20px"></div>
-                  <div class="bar" style="height:${ha}px;background:${b.color};width:20px"></div>
-                </div>
-                <div class="alloc-group-label" style="color:${b.color}">${b.g}</div>
-                <div class="alloc-numbers">${b.allocated}/${b.planned}</div>
-              </div>`;
-            }).join('')}
-          </div>
-          <div class="alloc-legend">
-            <span><span class="alloc-legend-dot" style="background:#6B6F80;opacity:.3"></span>Planejado</span>
-            <span><span class="alloc-legend-dot" style="background:#6B6F80"></span>Cadastrado</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid-2" style="align-items:start">
-    <div class="dash-section">
-      <div class="dash-section-head"><h2>Argumentos Estratégicos</h2></div>
-      ${stratData.map(s=>`<div class="strat-mini">
-        <div class="strat-mini-eyebrow">${s.eyebrow||''}</div>
-        <div class="strat-mini-title">${s.title||''}</div>
-        <div class="strat-mini-cols">
-          <div class="strat-mini-col before">
-            <div class="strat-mini-col-label">${(s.before||{}).label||'Antes'}</div>
-            <ul>${((s.before||{}).items||[]).slice(0,4).map(i=>`<li>${i}</li>`).join('')}</ul>
-          </div>
-          <div class="strat-mini-col after">
-            <div class="strat-mini-col-label">${(s.after||{}).label||'Depois'}</div>
-            <ul>${((s.after||{}).items||[]).slice(0,4).map(i=>`<li>${i}</li>`).join('')}</ul>
-          </div>
-        </div>
-      </div>`).join('')}
-    </div>
-
-    <div>
-      <div class="dash-section">
-        <div class="dash-section-head"><h2>Dependências Externas</h2><span>fora do controle da tribo</span></div>
-        <div style="background:var(--card);border:1px solid var(--g200);border-radius:12px;padding:16px">
-          ${extData.map(e=>`<div class="ext-dep-row">
-            <span class="imp-badge imp-${e.impact}">${e.impact}</span>
-            <div style="flex:1">
-              <div style="font-size:13px;font-weight:700;color:var(--ink)">${e.name}</div>
-              <div style="font-size:11px;color:var(--g400)">${e.category} · Squads: ${(e.squads||[]).join(', ')}</div>
-            </div>
-          </div>`).join('')}
-        </div>
-      </div>
-
-      <div class="dash-section" style="margin-top:20px">
-        <div class="dash-section-head"><h2>Team Members</h2></div>
-        <div class="team-mini-grid">
-          ${members.map(m=>{
-            const sq=dashData.squads.find(s=>s.id===m.squadId);
-            const g=sq?sq.group:'';
-            const gm_=gm(g);
-            const rc=ROLE_COLORS[m.role]||ROLE_COLORS.OUTRO;
-            const rf=ROLE_FAINT[m.role]||ROLE_FAINT.OUTRO;
-            return `<div class="team-mini-card" style="--tc:${gm_.color}">
-              <span class="tm-role" style="background:${rf};color:${rc}">${m.role}</span>
-              <div class="tm-name">${m.name||'(a definir)'}</div>
-              <div class="tm-title">${m.title||''}</div>
-              ${sq?`<div class="tm-squad">${sq.id} · ${sq.name.substring(0,16)}</div>`:''}
-            </div>`;
-          }).join('')||'<div style="color:var(--g400);font-size:13px">Nenhum membro cadastrado.</div>'}
-        </div>
-      </div>
-    </div>
-  </div>`;
-
-  document.getElementById('dash-main').innerHTML=html;
-}
-
-function kpiCard(n,label,color,sub){
-  return `<div class="kpi-card" style="--kpi-color:${color}">
-    <div class="kpi-n">${n}</div>
-    <div class="kpi-l">${label}</div>
-    ${sub?`<div class="kpi-sub">${sub}</div>`:''}
-  </div>`;
-}
-
-const DEFAULT_RISKS=[
-  {id:'r1',title:'Specs OpenAPI desatualizadas',probability:'alta',impact:'alto',status:'aberto',owner:'A2'},
-  {id:'r2',title:'Chave de LLM exposta',probability:'media',impact:'alto',status:'aberto',owner:'A3'},
-  {id:'r3',title:'Breaking change no MFE',probability:'media',impact:'alto',status:'aberto',owner:'C1'},
-  {id:'r4',title:'Protocolo Build×Run',probability:'alta',impact:'medio',status:'aberto',owner:'R1'},
-];
-const DEFAULT_STRATEGIC=[
-  {id:'s1',eyebrow:'⚡ Independência de plataforma',
-   title:'Axway hoje limita o ritmo de inovação.',
-   before:{label:'Hoje — com Axway',items:['Roadmap depende do vendor','IA, MCP e gRPC fora do escopo']},
-   after:{label:'Com esta proposta',items:['Roadmap controlado pela tribo','MCP, gRPC e IA nativos']}}
-];
-const DEFAULT_EXT=[
-  {id:'ext1',name:'BACEN / Open Finance',category:'Regulatório',impact:'alto',squads:['B3','B2']},
-  {id:'ext2',name:'Aarin',category:'Parceiro',impact:'alto',squads:['C1','C2']},
-  {id:'ext3',name:'Microsoft Entra ID',category:'Identidade',impact:'alto',squads:['A1','C1']},
-];
-
-// ── INIT ─────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────
 async function init(){
   const user=sessionStorage.getItem('dash_user');
   if(user){
@@ -547,21 +335,172 @@ async function init(){
     try{
       await fbSignIn();
       const state=await fbGet('state');
-      if(state&&state.squads) loadState(state);
-      showDash();
+      loadState(state);
+      setSyncLabel(true,state&&state.lastAt?state.lastAt:null);
       startSSE();
-    }catch(e){
-      showDash(); // show with defaults
-    }
+    }catch(e){ setSyncLabel(false); }
+    document.getElementById('login-layer').style.display='none';
+    document.getElementById('app-layer').style.display='';
+    document.getElementById('sync-user').textContent=user;
+    renderAll();
   } else {
-    document.getElementById('login-screen').style.display='';
+    document.getElementById('login-layer').style.display='';
+    document.getElementById('app-layer').style.display='none';
   }
 }
+
+// ── DATA ─────────────────────────────────────────────────────────────────
+// ── HEALTH LOGIC ──────────────────────────────────────────────────────────
+function health(sq){
+  if(sq.alloc===0&&sq.people>0) return 'gap';
+  const hasHighRisk=RISKS.some(r=>r.owner===sq.id&&r.prob==='alta'&&r.status==='aberto');
+  if(sq.alloc>=sq.people*0.5&&!hasHighRisk) return 'ok';
+  return 'warn';
+}
+function healthColor(h){return h==='ok'?'var(--ok)':h==='warn'?'var(--warn)':'var(--gap)';}
+
+function renderAll(){
+// ── KPIs ─────────────────────────────────────────────────────────────────
+const totalPeople=SQUADS.reduce((a,s)=>a+s.people,0);
+const totalAlloc=SQUADS.reduce((a,s)=>a+s.alloc,0);
+const allocPct=Math.round(totalAlloc/SQUADS.length*100/8);
+const critRisks=RISKS.filter(r=>r.prob==='alta'||r.impact==='alto').length;
+const extHigh=EXTDEPS.filter(e=>e.impact==='alto').length;
+
+document.getElementById('kpis').innerHTML=[
+  {n:SQUADS.length,l:'Squads',badge:null},
+  {n:'~'+totalPeople,l:'Pessoas planejadas',badge:null},
+  {n:`${totalAlloc}/${SQUADS.length}`,l:'Membros alocados',
+   badge:`<span class="kpi-badge ${allocPct>=50?'badge-ok':allocPct>=25?'badge-warn':'badge-gap'}">${allocPct}% alocado</span>`},
+  {n:critRisks,l:'Riscos críticos ou altos',
+   badge:`<span class="kpi-badge ${critRisks===0?'badge-ok':'badge-gap'}">${critRisks===0?'Tudo ok':critRisks+' abertos'}</span>`},
+  {n:extHigh,l:'Dependências externas — alto impacto',badge:null}
+].map((k,i)=>`<div class="kpi" style="${i>0?'padding-left:32px':''}">
+  <div class="kpi-n">${k.n}</div>
+  <div class="kpi-label">${k.l}</div>
+  ${k.badge||''}
+</div>`).join('<div class="kpi-divider"></div>');
+
+// ── SQUAD MAP ────────────────────────────────────────────────────────────
+let activePill=null;
+
+function togglePill(id){
+  const wasActive=activePill===id;
+  // Close all
+  document.querySelectorAll('.detail-panel').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  activePill=null;
+  if(!wasActive){
+    activePill=id;
+    const panel=document.getElementById('dp-'+id);
+    const pill=document.querySelector('.pill[data-id="'+id+'"]');
+    if(panel){panel.classList.add('open');}
+    if(pill){pill.classList.add('active');}
+  }
+}
+
+const groupOrder=['A','B','C','R',...Object.keys(GROUPS).filter(g=>!['A','B','C','R'].includes(g))];
+const mapHtml=groupOrder.map(g=>{
+  const gm=GROUPS[g];
+  const squads=SQUADS.filter(s=>s.g===g);
+  const pills=squads.map(sq=>{
+    const h=health(sq);
+    const hc=healthColor(h);
+    return `<div class="pill" data-id="${sq.id}" onclick="togglePill('${sq.id}')"
+      style="background:${h==='gap'?'rgba(239,68,68,.07)':h==='warn'?'rgba(245,158,11,.07)':'rgba(16,185,129,.07)'}">
+      <span class="pill-id" style="color:${gm.color}">${sq.id}</span>
+      <span class="pill-name">${sq.name}</span>
+      <span class="pill-dot" style="background:${hc}"></span>
+    </div>
+    <div class="detail-panel" id="dp-${sq.id}">
+      <div class="detail-inner">
+        <span class="detail-close" onclick="togglePill('${sq.id}')">fechar ✕</span>
+        <div class="detail-grid">
+          <div class="detail-stat">
+            <span class="detail-stat-n">${sq.alloc}/${sq.people}</span>
+            <span class="detail-stat-l">Membros alocados</span>
+          </div>
+          <div class="detail-stat">
+            <span class="detail-stat-n">${sq.caps}</span>
+            <span class="detail-stat-l">Capabilities</span>
+          </div>
+          <div class="detail-stat">
+            <span class="detail-stat-n" style="color:${sq.risks>0?'var(--warn)':'var(--ok)'}">${sq.risks}</span>
+            <span class="detail-stat-l">Riscos associados</span>
+          </div>
+        </div>
+        <div class="detail-mandate">${sq.mandate}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  return `<div class="group-lane">
+    <div class="lane-header">
+      <div class="lane-color" style="background:${gm.color}"></div>
+      <span class="lane-name">${g} · ${gm.name}</span>
+      <span class="lane-count">${squads.length} squads</span>
+    </div>
+    <div class="pills">${pills}</div>
+  </div>`;
+}).join('');
+
+document.getElementById('squad-map').innerHTML=mapHtml;
+
+// ── RISKS ────────────────────────────────────────────────────────────────
+const scoreMap={alta_alto:'critico',alta_medio:'alto',media_alto:'alto',media_medio:'medio',baixa_alto:'medio'};
+const scoreClass=r=>scoreMap[`${r.prob}_${r.impact}`]||'medio';
+const riskData=(RISKS&&RISKS.length)?RISKS:DEFAULT_RISKS;
+document.getElementById('risk-list').innerHTML=riskData.map(r=>{
+  const sc=scoreClass(r);
+  const sc_color=sc==='critico'?'var(--gap)':sc==='alto'?'#EF4444':'var(--warn)';
+  return `<div class="risk-item">
+    <div class="risk-sev" style="background:${sc_color}"></div>
+    <div>
+      <div class="risk-title">${r.title}</div>
+      <div class="risk-meta">
+        <span class="risk-pill r-${sc}">${sc}</span>
+        <span>${r.cat}</span>
+        <span style="color:var(--faint)">→ ${r.owner}</span>
+      </div>
+    </div>
+  </div>`;
+}).join('');
+
+// ── EXT DEPS ─────────────────────────────────────────────────────────────
+const extData=(EXTDEPS&&EXTDEPS.length)?EXTDEPS:DEFAULT_EXT;
+document.getElementById('ext-list').innerHTML=extData.map(e=>`
+  <div class="ext-item">
+    <span class="ext-imp ei-${e.impact}">${e.impact}</span>
+    <div>
+      <div class="ext-name">${e.name}</div>
+      <div class="ext-squads">${e.squads.join(' · ')}</div>
+    </div>
+  </div>`).join('');
+
+// ── STRATEGY ─────────────────────────────────────────────────────────────
+const stratData=(STRATEGY&&STRATEGY.length)?STRATEGY:DEFAULT_STRATEGY;
+document.getElementById('strat-list').innerHTML=stratData.map(s=>`
+  <div class="strat-card">
+    <div class="strat-eyebrow">${s.eyebrow}</div>
+    <div class="strat-title">${s.title}</div>
+    <div class="strat-cols">
+      <div class="strat-col sc-before">
+        <div class="strat-col-label">${s.before.label}</div>
+        <ul>${s.before.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>
+      <div class="strat-col sc-after">
+        <div class="strat-col-label">${s.after.label}</div>
+        <ul>${s.after.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      </div>
+    </div>
+  </div>`).join('');
+} // end renderAll
 
 document.getElementById('d-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('d-pass').focus();});
 document.getElementById('d-pass').addEventListener('keydown',e=>{if(e.key==='Enter')dashLogin();});
 
 init();
 </script>
+</div><!-- /app-layer -->
 </body>
 </html>
