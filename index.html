@@ -475,7 +475,7 @@ footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size
 <div id="main-content" style="display:none">
   <header class="hero">
     <div class="eyebrow"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;margin-right:2px"></span>Bradesco as a Service · Visão Consolidada da Tribo · <b>v3.1</b></div>
-    <h1>Treze squads. Uma <em>tribo única</em>.</h1>
+    <h1><span id="hero-squad-count">Treze</span> squads. Uma <em>tribo única</em>.</h1>
     <p>Visão consolidada de toda a Tribo. Clique em <b>✏️ Editar</b> para modificar, adicionar ou excluir squads, grupos e membros. Todas as alterações são salvas automaticamente no navegador.</p>
     <div class="hero-stats" id="hero-stats"></div>
   </header>
@@ -985,6 +985,10 @@ function updateHeroStats(){
     <div><div class="hstat-n">~${people}</div><div class="hstat-l">Pessoas na Tribo</div></div>
     <div><div class="hstat-n">${Object.keys(groups).length}</div><div class="hstat-l">Grupos</div></div>
     <div><div class="hstat-n">${members.length}</div><div class="hstat-l">Membros cadastrados</div></div>`;
+  const nums=['Zero','Uma','Duas','Três','Quatro','Cinco','Seis','Sete','Oito','Nove','Dez',
+    'Onze','Doze','Treze','Quatorze','Quinze','Dezesseis','Dezessete','Dezoito','Dezenove','Vinte'];
+  const el=document.getElementById('hero-squad-count');
+  if(el) el.textContent=nums[total]||total;
 }
 
 // ═══ TOGGLE CARD (scrollHeight — nunca corta) ═══
