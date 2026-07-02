@@ -474,7 +474,7 @@ footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size
 <!-- MAIN CONTENT -->
 <div id="main-content" style="display:none">
   <header class="hero">
-    <div class="eyebrow"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;margin-right:2px"></span>Bradesco as a Service · Visão Consolidada da Tribo</div>
+    <div class="eyebrow"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;margin-right:2px"></span>Bradesco as a Service · Visão Consolidada da Tribo · <b>v3.1</b></div>
     <h1>Treze squads. Uma <em>tribo única</em>.</h1>
     <p>Visão consolidada de toda a Tribo. Clique em <b>✏️ Editar</b> para modificar, adicionar ou excluir squads, grupos e membros. Todas as alterações são salvas automaticamente no navegador.</p>
     <div class="hero-stats" id="hero-stats"></div>
@@ -858,6 +858,12 @@ function renderMembers(){
 function renderAll(){
   const root=document.getElementById('sections-root');
   if(!root) return;
+  // GARANTIA: squads e members são sempre arrays — Firebase pode retornar objetos
+  if(!Array.isArray(squads)) squads=Object.values(squads||{}).filter(s=>s&&s.id);
+  if(!Array.isArray(members)) members=Object.values(members||{}).filter(m=>m&&m.id);
+  if(!groups||typeof groups!=='object'||Array.isArray(groups)) groups=Object.assign({},DEFAULT_GROUPS);
+  // Garante que cada squad tem os arrays obrigatórios
+  squads=squads.map(s=>({...s,capabilities:s.capabilities||[],scope:s.scope||[],risks:s.risks||[],premises:s.premises||[]}));
   let html='';
   try{
   const orderedGroups=[...GROUP_ORDER,...Object.keys(groups||{}).filter(g=>!GROUP_ORDER.includes(g))];
