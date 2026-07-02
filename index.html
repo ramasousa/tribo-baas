@@ -383,10 +383,10 @@ footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size
       </div>
     </div>
     <div class="modal-footer">
-      <div></div>
+      <button class="btn-danger" id="g-del-btn" onclick="deleteGroup()" style="display:none">Excluir grupo</button>
       <div style="display:flex;gap:8px">
         <button class="btn-secondary" onclick="closeGroupModal()">Cancelar</button>
-        <button class="btn-primary" onclick="saveGroupModal()">Criar Grupo</button>
+        <button class="btn-primary" id="g-save-btn" onclick="saveGroupModal()">Criar Grupo</button>
       </div>
     </div>
   </div>
@@ -887,6 +887,7 @@ function renderAll(){
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <div class="group-badge" style="${badgeStyle}">${count}</div>
           ${addBtn}
+          <button class="add-squad-btn" onclick="openGroupEdit('${g}')" style="border-style:solid;color:${m.color};border-color:${m.color}">✏️ Editar grupo</button>
         </div>
       </div>
       ${isRun?cards:`<div class="${grid}">${cards}</div>`}
@@ -1118,21 +1119,75 @@ function saveSquadModal(){
 }
 
 // ═══ GROUP MODAL ═══
-function openGroupModal(){document.getElementById('group-overlay').classList.add('show');}
-function closeGroupModal(){document.getElementById('group-overlay').classList.remove('show');}
+function openGroupModal(){
+  editingGroupId=null;
+  document.getElementById('g-id').value='';
+  document.getElementById('g-id').disabled=false;
+  document.getElementById('g-name').value='';
+  document.getElementById('g-desc').value='';
+  document.getElementById('g-method').value='Scrum';
+  document.querySelectorAll('.color-swatch').forEach((s,i)=>s.classList.toggle('selected',i===0));
+  selectedGroupColor={color:'#CC092F',faint:'#FBE9EC'};
+  const delBtn=document.getElementById('g-del-btn');
+  const saveBtn=document.getElementById('g-save-btn');
+  if(delBtn) delBtn.style.display='none';
+  if(saveBtn) saveBtn.textContent='Criar Grupo';
+  document.getElementById('group-overlay').classList.add('show');
+}
+function openGroupEdit(id){
+  const m=groups[id];if(!m) return;
+  editingGroupId=id;
+  document.getElementById('g-id').value=id;
+  document.getElementById('g-id').disabled=true;
+  document.getElementById('g-name').value=m.name||'';
+  document.getElementById('g-desc').value=m.desc||'';
+  document.getElementById('g-method').value=m.methodology||'Scrum';
+  document.querySelectorAll('.color-swatch').forEach(s=>{
+    const match=s.dataset.color===m.color;
+    s.classList.toggle('selected',match);
+    if(match) selectedGroupColor={color:s.dataset.color,faint:s.dataset.faint||s.dataset.color+'22'};
+  });
+  const delBtn=document.getElementById('g-del-btn');
+  const saveBtn=document.getElementById('g-save-btn');
+  if(delBtn) delBtn.style.display='block';
+  if(saveBtn) saveBtn.textContent='Salvar alterações';
+  document.getElementById('group-overlay').classList.add('show');
+}
+function closeGroupModal(){
+  document.getElementById('group-overlay').classList.remove('show');
+  editingGroupId=null;
+}
+function deleteGroup(){
+  if(!editingGroupId) return;
+  const m=groups[editingGroupId];
+  const nome=prompt('Para excluir o grupo "'+m.name+'", digite seu nome completo:');
+  if(!nome||!nome.trim()){showToast('Exclusão cancelada.');return;}
+  const squadsNoGrupo=squads.filter(s=>s.group===editingGroupId);
+  if(squadsNoGrupo.length>0){
+    if(!confirm('O grupo "'+m.name+'" tem '+squadsNoGrupo.length+' squad(s). Excluir o grupo também excluirá essas squads. Continuar?')) return;
+    squads=squads.filter(s=>s.group!==editingGroupId);
+  }
+  delete groups[editingGroupId];
+  persist();closeGroupModal();renderAll();
+  showToast('Grupo excluído por '+nome.trim()+' ✓');
+}
 function selectColor(el){
   document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
   el.classList.add('selected');
   selectedGroupColor={color:el.dataset.color,faint:el.dataset.faint};
 }
 function saveGroupModal(){
-  const id=document.getElementById('g-id').value.trim().toUpperCase();
+  const id=editingGroupId||document.getElementById('g-id').value.trim().toUpperCase();
   const name=document.getElementById('g-name').value.trim();
   if(!id||!name){showToast('⚠️ Informe ID e Nome do grupo.');return;}
-  if(groups[id]){showToast('⚠️ Já existe grupo com este ID.');return;}
-  groups[id]={name,color:selectedGroupColor.color,faint:selectedGroupColor.faint,
-    desc:document.getElementById('g-desc').value.trim()};
-  persist();closeGroupModal();renderAll();showToast(`Grupo ${id} criado!`);
+  if(!editingGroupId&&groups[id]){showToast('⚠️ Já existe grupo com este ID.');return;}
+  groups[id]={name,
+    color:selectedGroupColor.color,
+    faint:selectedGroupColor.faint||selectedGroupColor.color+'22',
+    desc:document.getElementById('g-desc').value.trim(),
+    methodology:document.getElementById('g-method').value};
+  persist();closeGroupModal();renderAll();
+  showToast(editingGroupId?`Grupo ${id} atualizado ✓`:`Grupo ${id} criado!`);
 }
 
 // ═══ MEMBER MODAL ═══
