@@ -609,26 +609,6 @@ function updateSyncBadge(){
   badge.style.color='#22C55E';
 }
 
-// ═══ FIREBASE CONFIG MODAL ═══════════════════════════════════════════
-function openFBConfig(){
-  document.getElementById('fb-apikey').value=FIREBASE_CONFIG.apiKey||'';
-  document.getElementById('fb-projectid').value=FIREBASE_CONFIG.projectId||'';
-  document.getElementById('fb-url').value=FIREBASE_CONFIG.databaseURL||'';
-  document.getElementById('fb-overlay').classList.add('show');
-}
-function closeFBConfig(){document.getElementById('fb-overlay').classList.remove('show');}
-function saveFBConfig(){
-  const k=document.getElementById('fb-apikey').value.trim();
-  const p=document.getElementById('fb-projectid').value.trim();
-  const u=document.getElementById('fb-url').value.trim();
-  if(!k||!p||!u){showToast('⚠️ Preencha todos os campos.');return;}
-  localStorage.setItem('fb_apiKey',k);
-  localStorage.setItem('fb_projectId',p);
-  localStorage.setItem('fb_databaseURL',u.replace(/\/$/,''));
-  FIREBASE_CONFIG.apiKey=k;FIREBASE_CONFIG.projectId=p;FIREBASE_CONFIG.databaseURL=u.replace(/\/$/,'');
-  showToast('Configuração salva! Recarregando...');
-  setTimeout(()=>location.reload(),1200);
-}
 async function persist(){
   const state={squads,groups,members,lastBy:currentUser,lastAt:new Date().toISOString()};
   if(isFBReady()&&fbToken){
@@ -713,10 +693,10 @@ function accentStyle(g){const m=groups[g]||DEFAULT_GROUPS[g];return m?`--accent:
 function renderCard(sq){
   const m=groups[sq.group]||DEFAULT_GROUPS[sq.group]||{color:'#6B6F80',faint:'#EFEDE8'};
   const isRun=sq.group==='R';
-  const caps=sq.capabilities.map(c=>`<li>${c}</li>`).join('');
-  const scope=sq.scope.map(s=>`<li>${s}</li>`).join('');
-  const risks=sq.risks.map(r=>`<div class="risk-item">${r}</div>`).join('');
-  const prems=sq.premises.map(p=>`<div class="premise-item">${p}</div>`).join('');
+  const caps=(sq.capabilities||[]).map(c=>`<li>${c}</li>`).join('');
+  const scope=(sq.scope||[]).map(s=>`<li>${s}</li>`).join('');
+  const risks=(sq.risks||[]).map(r=>`<div class="risk-item">${r}</div>`).join('');
+  const prems=(sq.premises||[]).map(p=>`<div class="premise-item">${p}</div>`).join('');
   const actions=`<div class="squad-actions"><button class="btn-edit" onclick="event.stopPropagation();openSquadEdit('${sq.id}')">✏️</button><button class="btn-del" onclick="event.stopPropagation();askDeleteSquad('${sq.id}')">✕</button></div>`;
   const detail=`<div class="squad-detail"><div class="squad-detail-inner">
     <div class="sd-block"><div class="sd-label">Capabilities</div><ul class="sd-list">${caps}</ul></div>
@@ -874,8 +854,10 @@ function renderMembers(){
 
 function renderAll(){
   const root=document.getElementById('sections-root');
+  if(!root) return;
   let html='';
-  const orderedGroups=[...GROUP_ORDER,...Object.keys(groups).filter(g=>!GROUP_ORDER.includes(g))];
+  try{
+  const orderedGroups=[...GROUP_ORDER,...Object.keys(groups||{}).filter(g=>!GROUP_ORDER.includes(g))];
   orderedGroups.forEach(g=>{
     const m=groups[g];if(!m) return;
     const gs=squads.filter(s=>s.group===g);if(!gs.length&&g!=='A'&&g!=='B'&&g!=='C'&&g!=='R') return;
@@ -902,6 +884,8 @@ function renderAll(){
     </div>`;
   });
 
+  }catch(e){console.error('Squad sections:',e);}
+  try{
   // Flow
   html+=`<div class="section" id="fluxo" style="scroll-margin-top:72px">
     <div class="section-head"><div class="section-head-left"><div class="seyebrow">Squad a squad</div><h2>Fluxo de dependências</h2><p>Clique em qualquer squad para destacar suas conexões e ver o que ela fornece e consome.</p></div></div>
@@ -917,9 +901,13 @@ function renderAll(){
     </div>
   </div>`;
 
+  }catch(e){console.error('Flow:',e);}
+  try{
   // Team Members
   html+=renderMembers();
 
+  }catch(e){console.error('Members:',e);}
+  try{
   // Autonomia
   html+=`<div class="section" id="autonomia" style="scroll-margin-top:72px">
     <div class="section-head"><div class="section-head-left"><div class="seyebrow">Argumento estratégico</div><h2>Autonomia frente ao vendor atual</h2></div></div>
@@ -962,7 +950,8 @@ function renderAll(){
     </div>
   </div>`;
 
-  root.innerHTML=html;
+  }catch(e){console.error('Static sections:',e);}
+  root.innerHTML=html||'<div style="padding:40px 28px;font-family:sans-serif"><h2 style="color:#CC092F">Erro ao renderizar</h2><p style="margin-top:8px;color:#666">Abra o console (F12) para ver os detalhes.</p></div>';
   buildNavLinks();
   updateHeroStats();
 }
