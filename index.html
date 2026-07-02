@@ -449,44 +449,6 @@ footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- FIREBASE CONFIG MODAL -->
-<div class="modal-overlay" id="fb-overlay">
-  <div class="modal modal-sm">
-    <div class="modal-header">
-      <span class="modal-title">🔥 Configurar Firebase</span>
-      <button class="modal-close" onclick="closeFBConfig()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#3D4150;margin-bottom:16px;line-height:1.6">
-        <b>Setup rápido (5 min):</b><br>
-        1. <b>console.firebase.google.com</b> → Criar projeto<br>
-        2. Build → <b>Realtime Database</b> → Criar → Modo de teste<br>
-        3. Build → <b>Authentication</b> → habilitar <b>Anônimo</b><br>
-        4. ⚙️ Configurações do projeto → copiar API Key e Project ID
-      </div>
-      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:10px 14px;font-size:12px;color:#3D4150;margin-bottom:16px;line-height:1.6">
-        <b>Regras de segurança</b> (Realtime Database → Regras):<br>
-        <code style="font-family:monospace;font-size:11px;background:rgba(0,0,0,.06);padding:2px 5px;border-radius:4px">{ ".read": "auth != null", ".write": "auth != null" }</code>
-      </div>
-      <div class="form-row">
-        <label class="form-label">API Key</label>
-        <input class="form-input" id="fb-apikey" placeholder="AIzaSy..."/>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Project ID</label>
-        <input class="form-input" id="fb-projectid" placeholder="meu-projeto-12345"/>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Database URL</label>
-        <input class="form-input" id="fb-url" placeholder="https://meu-projeto-default-rtdb.firebaseio.com"/>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeFBConfig()">Cancelar</button>
-      <button class="btn-primary" onclick="saveFBConfig()">Salvar e reconectar</button>
-    </div>
-  </div>
-</div>
 
 <!-- NAV -->
 <nav class="nav" id="main-nav" style="display:none">
@@ -503,7 +465,6 @@ footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size
     <div class="nav-right">
       <span id="sync-badge" style="font-size:11px;color:#9CA3AF;white-space:nowrap">⚪ Local</span>
       <div class="nav-user"><span class="nav-user-dot"></span><span id="nav-user-email"></span></div>
-      <button class="btn-nav" onclick="openFBConfig()" title="Firebase" style="padding:6px 10px">🔥</button>
       <button class="btn-nav edit-btn" onclick="toggleEditMode()" id="edit-btn">✏️ Editar</button>
       <button class="btn-nav" onclick="doLogout()">Sair</button>
     </div>
@@ -552,14 +513,12 @@ const DEFAULT_SQUADS=[
 ];
 
 // ═══ FIREBASE CONFIG ════════════════════════════════════════════════
-// Preencha após criar o projeto em console.firebase.google.com
-// Guia rápido: Projeto → Realtime Database → Authentication (Anonymous)
 const FIREBASE_CONFIG = {
-  apiKey:      localStorage.getItem('fb_apiKey')      || '',
-  projectId:   localStorage.getItem('fb_projectId')   || '',
-  databaseURL: localStorage.getItem('fb_databaseURL') || ''
+  apiKey:      'AIzaSyAa3uxYyktTJC7o_CIx0RBFObWcxCPjzso',
+  projectId:   'realtime-database-61af7',
+  databaseURL: 'https://realtime-database-61af7-default-rtdb.firebaseio.com'
 };
-function isFBReady(){ return !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.databaseURL); }
+function isFBReady(){ return true; }
 
 // ═══ STATE ═══
 let db=null,squads=[],groups={},members=[],editMode=false,editingSquadId=null,editingMemberId=null,
@@ -1233,7 +1192,7 @@ function showToast(msg){
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);
 }
 // Close modals clicking outside
-['del-overlay','squad-overlay','group-overlay','member-overlay','fb-overlay'].forEach(id=>{
+['del-overlay','squad-overlay','group-overlay','member-overlay'].forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
 });
