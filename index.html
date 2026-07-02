@@ -581,9 +581,11 @@ function startSSE(){
         const state=msg.data;
         // Ignora updates que vieram de nós mesmos (evita loop)
         if(state.lastBy===currentUser&&Date.now()-new Date(state.lastAt).getTime()<3000) return;
-        squads=state.squads||squads;
+        const sq=state.squads;
+        const mb=state.members;
+        squads=sq?(Array.isArray(sq)?sq:Object.values(sq)):squads;
         groups=state.groups||groups;
-        members=state.members||members;
+        members=mb?(Array.isArray(mb)?mb:Object.values(mb)):members;
         lastSyncAt=new Date();
         renderAll();updateSyncBadge();
         if(state.lastBy&&state.lastBy!==currentUser)
@@ -646,17 +648,18 @@ async function doLogin(){
       // Carrega dados do Firebase
       const state=await fbGet('state').catch(()=>null);
       if(state&&state.squads){
-        squads=state.squads;
+        // Firebase converte arrays em objetos {0:{},1:{}...} — reconverte para array
+        squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
         groups=state.groups||Object.assign({},DEFAULT_GROUPS);
-        members=state.members||[];
+        members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
       }
     } else {
       // Fallback: carrega do IndexedDB local
       const state=await dbGet('state').catch(()=>null);
       if(state&&state.squads){
-        squads=state.squads;
+        squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
         groups=state.groups||Object.assign({},DEFAULT_GROUPS);
-        members=state.members||[];
+        members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
       }
     }
   }catch(e){
@@ -1203,9 +1206,9 @@ async function init(){
         await fbSignInAnonymous();
         const state=await fbGet('state').catch(()=>null);
         if(state&&state.squads){
-          squads=state.squads;
+          squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
           groups=state.groups||Object.assign({},DEFAULT_GROUPS);
-          members=state.members||[];
+          members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
         }
         lastSyncAt=new Date();
         startSSE();
@@ -1213,9 +1216,9 @@ async function init(){
         // Sem Firebase → carrega do cache IndexedDB
         const state=await dbGet('state').catch(()=>null);
         if(state&&state.squads){
-          squads=state.squads;
+          squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
           groups=state.groups||Object.assign({},DEFAULT_GROUPS);
-          members=state.members||[];
+          members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
         }
       }
     }catch(e){ console.warn('Reconnect error:',e); }
