@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Executivo · Bradesco as a Service</title>
+<style>
+:root{
+  --bg:#0A0C15;--card:#13162A;--card2:#181B2E;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --text:#F8F6F0;--muted:rgba(248,246,240,.42);--faint:rgba(248,246,240,.18);
+  --red:#CC092F;--red-faint:rgba(204,9,47,.15);
+  --gA:#CC092F;--gAf:rgba(204,9,47,.12);
+  --gB:#4F46E5;--gBf:rgba(79,70,229,.12);
+  --gC:#1A8754;--gCf:rgba(26,135,84,.12);
+  --gR:#0EA5E9;--gRf:rgba(14,165,233,.12);
+  --ok:#10B981;--warn:#F59E0B;--gap:#EF4444;
+  --serif:Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mono:'SF Mono','Fira Code',Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* NAV */
+nav{height:52px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;position:sticky;top:0;z-index:100;background:rgba(10,12,21,.92);backdrop-filter:blur(16px)}
+.nav-brand{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:700;font-size:14px;color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.sync-wrap{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted)}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.nav-user{font-size:11.5px;color:var(--muted)}
+.nav-link{font-size:11.5px;color:var(--faint);text-decoration:none;border:1px solid var(--border);padding:4px 12px;border-radius:6px;transition:all .2s}
+.nav-link:hover{color:var(--text);border-color:var(--border2)}
+
+/* HERO */
+.hero{padding:40px 32px 36px;border-bottom:1px solid var(--border)}
+.hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+.hero-kpis{display:flex;gap:0;margin-top:8px}
+.kpi{flex:1;padding:20px 0;position:relative}
+.kpi+.kpi{border-left:1px solid var(--border);padding-left:32px}
+.kpi-n{font-family:var(--serif);font-size:clamp(36px,3.5vw,52px);font-weight:700;color:var(--text);line-height:1;letter-spacing:-.02em}
+.kpi-label{font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.04em}
+.kpi-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;margin-top:8px}
+.badge-ok{background:rgba(16,185,129,.15);color:#34D399}
+.badge-warn{background:rgba(245,158,11,.15);color:#FCD34D}
+.badge-gap{background:rgba(239,68,68,.15);color:#FCA5A5}
+.kpi-divider{width:1px;background:var(--border);margin:0 32px;align-self:stretch}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 320px;min-height:calc(100vh - 52px - 180px - 120px)}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+
+/* SQUAD MAP */
+.map-section{padding:28px 32px;border-right:1px solid var(--border)}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:18px}
+.group-lane{margin-bottom:4px;border-radius:10px;overflow:hidden;transition:background .2s}
+.group-lane:hover{background:rgba(255,255,255,.02)}
+.lane-header{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
+.lane-color{width:3px;height:18px;border-radius:2px;flex-shrink:0}
+.lane-name{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.lane-count{font-size:10px;color:var(--faint);margin-left:auto;font-family:var(--mono)}
+.pills{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 12px}
+.pill{display:flex;align-items:center;gap:7px;padding:6px 12px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .18s;position:relative;user-select:none}
+.pill:hover{border-color:var(--border2);background:rgba(255,255,255,.05)}
+.pill.active{border-color:var(--border2);background:rgba(255,255,255,.06)}
+.pill-id{font-family:var(--mono);font-size:11.5px;font-weight:700}
+.pill-name{font-size:11.5px;color:var(--muted);max-width:120px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-left:2px}
+
+/* DETAIL PANEL */
+.detail-panel{overflow:hidden;transition:max-height .28s cubic-bezier(.4,0,.2,1),opacity .2s;max-height:0;opacity:0}
+.detail-panel.open{max-height:300px;opacity:1}
+.detail-inner{margin:0 14px 14px;background:var(--card2);border-radius:10px;padding:18px 20px;border:1px solid var(--border)}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.detail-stat{display:flex;flex-direction:column;gap:4px}
+.detail-stat-n{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--text)}
+.detail-stat-l{font-size:10.5px;color:var(--muted)}
+.detail-mandate{font-size:12px;color:var(--muted);line-height:1.6;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}
+.detail-close{float:right;font-size:11px;color:var(--faint);cursor:pointer;padding:2px 8px;border-radius:5px;border:1px solid var(--border)}
+.detail-close:hover{color:var(--text)}
+
+/* PULSE SIDEBAR */
+.pulse-section{padding:28px 24px;border-top:none}
+.pulse-block{margin-bottom:24px}
+.risk-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.risk-item:last-child{border-bottom:none}
+.risk-sev{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0}
+.risk-title{font-size:12.5px;color:var(--text);font-weight:600;line-height:1.4}
+.risk-meta{font-size:10.5px;color:var(--muted);margin-top:3px;display:flex;gap:8px}
+.risk-pill{font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px}
+.r-critico{background:rgba(153,27,27,.3);color:#FCA5A5}
+.r-alto{background:rgba(220,38,38,.2);color:#FCA5A5}
+.r-medio{background:rgba(217,119,6,.2);color:#FCD34D}
+
+.ext-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.ext-item:last-child{border-bottom:none}
+.ext-imp{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:100px;flex-shrink:0}
+.ei-alto{background:rgba(239,68,68,.15);color:#FCA5A5}
+.ei-medio{background:rgba(245,158,11,.15);color:#FCD34D}
+.ext-name{color:var(--text);font-weight:600}
+.ext-squads{font-size:10.5px;color:var(--muted)}
+
+/* STRATEGY BAND */
+.strategy-band{border-top:1px solid var(--border);padding:24px 32px}
+.strat-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.strat-scroll::-webkit-scrollbar{display:none}
+.strat-card{background:linear-gradient(135deg,#0F1220 0%,#1a0a10 60%,#0F1220 100%);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;min-width:340px;flex-shrink:0}
+.strat-eyebrow{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A78BFA;margin-bottom:8px}
+.strat-title{font-family:var(--serif);font-size:14px;color:var(--text);font-weight:700;line-height:1.4;margin-bottom:12px;max-width:280px}
+.strat-cols{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.strat-col{background:rgba(255,255,255,.04);border-radius:7px;padding:10px 12px}
+.strat-col-label{font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.sc-before .strat-col-label{color:#FCA5A5}
+.sc-after .strat-col-label{color:#86EFAC}
+.strat-col ul{list-style:none;font-size:10.5px;color:rgba(248,246,240,.6);line-height:1.75}
+.strat-col li{padding-left:11px;position:relative}
+.sc-before li::before{content:'✕';position:absolute;left:0;color:#FCA5A5;font-size:8px;top:2px}
+.sc-after li::before{content:'✓';position:absolute;left:0;color:#86EFAC;font-size:8px;top:2px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-layer" style="position:fixed;inset:0;background:#0A0C15;z-index:1000;display:flex;align-items:center;justify-content:center">
+  <div style="background:#13162A;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:40px;width:100%;max-width:380px">
+    <div style="font-family:Georgia,serif;font-size:22px;font-weight:700;color:#F8F6F0;margin-bottom:6px">Dashboard Executivo</div>
+    <div style="font-size:13px;color:rgba(248,246,240,.4);margin-bottom:28px">Bradesco as a Service · Tribo BaaS</div>
+    <input id="d-email" type="email" placeholder="seu.nome@bradesco.com.br" autocomplete="email"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#F8F6F0;font-size:14px;font-family:inherit;margin-bottom:10px"/>
+    <input id="d-pass" type="password" placeholder="Senha" autocomplete="current-password"
+      style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#F8F6F0;font-size:14px;font-family:inherit;margin-bottom:14px"/>
+    <button class="dash-login-btn" onclick="dashLogin()"
+      style="width:100%;padding:12px;border-radius:9px;border:none;background:#CC092F;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">Entrar →</button>
+    <div id="d-err" style="font-size:12px;color:#FCA5A5;margin-top:10px;text-align:center;min-height:16px"></div>
+  </div>
+</div>
+<!-- APP -->
+<div id="app-layer" style="display:none">
+<nav>
+  <div class="nav-brand">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <path d="M5 11.5L12 3l7 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M3.5 15L12 6.5l8.5 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+      <path d="M9.5 15.5v5.5M14.5 15.5v5.5" stroke="#F8F6F0" stroke-width="2.2" stroke-linecap="round"/>
+    </svg>
+    Bradesco as a Service
+  </div>
+  <div class="nav-right">
+    <div class="sync-wrap">
+      <span class="sync-dot"></span>
+      <span id="sync-lbl">Sync 17:35</span>
+    </div>
+    <span class="nav-user" id="sync-user"></span>
+    <a class="nav-link" onclick="dashLogout()" style="cursor:pointer">Sair</a>
+    <a class="nav-link" href="/tribo-baas/">← Documento</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">Dashboard Executivo · Tribo BaaS</div>
+  <div class="hero-kpis" id="kpis"></div>
+</section>
+
+<div class="main-grid">
+  <section class="map-section">
+    <div class="section-label">Saúde das squads — clique para ver detalhes</div>
+    <div id="squad-map"></div>
+  </section>
+
+  <section class="pulse-section">
+    <div class="section-label">Riscos em aberto</div>
+    <div class="pulse-block" id="risk-list"></div>
+    <div class="section-label" style="margin-bottom:14px">Dependências externas</div>
+    <div id="ext-list"></div>
+  </section>
+</div>
+
+<section class="strategy-band">
+  <div class="section-label" style="margin-bottom:14px">Argumentos estratégicos</div>
+  <div class="strat-scroll" id="strat-list"></div>
+</section>
+
+<script>
+// ── FIREBASE ──────────────────────────────────────────────────────────────
+const FB_KEY='AIzaSyAa3uxYyktTJC7o_CIx0RBFObWcxCPjzso';
+const FB_URL='https://realtime-database-61af7-default-rtdb.firebaseio.com';
+let fbToken=null,sseConn=null;
+
+async function fbSignIn(){
+  const r=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+FB_KEY,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});
+  const d=await r.json();if(d.error)throw new Error(d.error.message);
+  fbToken=d.idToken;
+}
+async function fbGet(path){
+  const r=await fetch(FB_URL+'/'+path+'.json?auth='+fbToken);
+  const d=await r.json();if(d&&d.error)throw new Error(d.error);return d;
+}
+function nA(v){if(!v)return[];if(Array.isArray(v))return v;try{return Object.values(v).filter(Boolean);}catch{return[];}}
+function nS(v){if(!v)return[];if(Array.isArray(v))return v;try{return Object.values(v).filter(x=>typeof x==='string');}catch{return[];}}
+
+// ── DEFAULTS ─────────────────────────────────────────────────────────────
+const DEF_GROUPS={
+  A:{name:'Developer Portal',color:'#CC092F',faint:'rgba(204,9,47,.12)'},
+  B:{name:'Produtos de Crédito',color:'#4F46E5',faint:'rgba(79,70,229,.12)'},
+  C:{name:'White Label BaaS',color:'#1A8754',faint:'rgba(26,135,84,.12)'},
+  R:{name:'Run — Operação',color:'#0EA5E9',faint:'rgba(14,165,233,.12)'}
+};
+const DEF_SQUADS=[
+  {id:'A1',group:'A',name:'Plataforma & Identidade',people:8,mandate:'Login, credenciais, console, design system e i18n.'},
+  {id:'A2',group:'A',name:'Produtos Financeiros (Docs)',people:8,mandate:'Documentação para CaaS, PIX, Seguros e Débito Veicular.'},
+  {id:'A3',group:'A',name:'BaaS + IA & Inovação',people:8,mandate:'MCP Server, gRPC, chatbot IA real e vitrine pública.'},
+  {id:'A4',group:'A',name:'DX & Confiabilidade',people:8,mandate:'SDKs, Postman Hub, Status Page e Webhooks.'},
+  {id:'A5',group:'A',name:'Plataforma API & Gateway',people:8,mandate:'Migração do Axway e COE de APIs.'},
+  {id:'B1',group:'B',name:'Capital de Giro',people:8,mandate:'Simulação, proposta, garantias e desembolso.'},
+  {id:'B2',group:'B',name:'Mais Prazo',people:8,mandate:'Renegociação e extensão de prazo de operações.'},
+  {id:'B3',group:'B',name:'Antecipação de Recebíveis',people:8,mandate:'Liquidez via antecipação de recebíveis.'},
+  {id:'B4',group:'B',name:'Crédito Emergencial',people:8,mandate:'Crédito de curto prazo, aprovação acelerada.'},
+  {id:'B5',group:'B',name:'Garantias',people:8,mandate:'Motor de garantias transversal para B1–B4.'},
+  {id:'B6',group:'B',name:'Pricing',people:8,mandate:'Motor de precificação transversal — taxas e CET.'},
+  {id:'C1',group:'C',name:'Plataforma MFE',people:8,mandate:'Shell App, Module Federation e BFF multi-tenant.'},
+  {id:'C2',group:'C',name:'Experiência do Parceiro',people:8,mandate:'Portal do operador e jornadas B2B/B2C/Embedded.'},
+  {id:'R1',group:'R',name:'Run — Operação',people:8,mandate:'Garante o funcionamento de todos os clientes integrados.'}
+];
+const DEF_RISKS=[
+  {title:'Specs OpenAPI desatualizadas',probability:'alta',impact:'alto',category:'Técnico',owner:'A2',status:'aberto'},
+  {title:'Chave de LLM exposta',probability:'media',impact:'alto',category:'Segurança',owner:'A3',status:'aberto'},
+  {title:'Breaking change no contrato MFE',probability:'media',impact:'alto',category:'Arquitetura',owner:'C1',status:'aberto'},
+  {title:'Interface Build × Run sem protocolo',probability:'alta',impact:'medio',category:'Operacional',owner:'R1',status:'aberto'}
+];
+const DEF_EXT=[
+  {name:'BACEN / Open Finance',impact:'alto',squads:['B3','B2']},
+  {name:'Aarin (CDN)',impact:'alto',squads:['C1','C2']},
+  {name:'Microsoft Entra ID',impact:'alto',squads:['A1','C1']},
+  {name:'DETRAN (multi-UF)',impact:'medio',squads:['A2','B5']},
+  {name:'SPI (PIX)',impact:'alto',squads:['B2']}
+];
+const DEF_STRATEGY=[
+  {eyebrow:'⚡ Independência de plataforma',
+   title:'Axway limita o ritmo de inovação. Esta proposta elimina essa dependência.',
+   before:{label:'Hoje — com Axway',items:['Roadmap depende do vendor','Customização limitada','Licenciamento por volume','IA, MCP e gRPC fora do escopo','White Label impossível nativamente']},
+   after:{label:'Com esta proposta',items:['Roadmap controlado pela tribo','Arquitetura própria, sem limite','Custo de infra previsível','MCP, gRPC e IA nativos','White Label zero-deploy via Design Tokens']}}
+];
+
+// ── STATE — começa sempre com defaults ────────────────────────────────────
+let S={
+  groups: Object.assign({},DEF_GROUPS),
+  squads: DEF_SQUADS.map(s=>({...s,alloc:0,caps:5,riskCount:0})),
+  members: [],
+  risks: DEF_RISKS,
+  extDeps: DEF_EXT,
+  strategy: DEF_STRATEGY
+};
+
+function applyFirebaseState(raw){
+  if(!raw) return;
+  try{
+    const groups={};
+    const rawG=raw.groups||{};
+    Object.entries(rawG).forEach(([k,v])=>{
+      if(v&&v.name) groups[k]={name:v.name,color:v.color||'#6B6F80',faint:v.faint||'rgba(107,111,128,.12)'};
+    });
+    if(Object.keys(groups).length) S.groups=groups;
+
+    const members=nA(raw.members);
+    const risks=nA(raw.risks);
+    const squadsRaw=nA(raw.squads);
+
+    if(squadsRaw.length){
+      S.squads=squadsRaw.map(sq=>{
+        const g=sq.group||sq.g||'A';
+        const alloc=members.filter(m=>m.squadId===sq.id).length;
+        const riskCount=risks.filter(r=>r.owner===sq.id&&r.status==='aberto').length;
+        const caps=nS(sq.capabilities).length||sq.caps||0;
+        return {...sq, group:g, g:g, people:parseInt(sq.people)||8, alloc, caps, riskCount,
+          mandate:sq.mandate||''};
+      });
+    }
+    if(members.length) S.members=members;
+    if(risks.length) S.risks=risks;
+    const extDeps=nA(raw.externalDeps);
+    if(extDeps.length) S.extDeps=extDeps;
+    const strategy=nA(raw.strategicCards);
+    if(strategy.length) S.strategy=strategy;
+  } catch(e){ console.warn('applyFirebaseState error:',e); }
+}
+
+// ── HEALTH ─────────────────────────────────────────────────────────────────
+function health(sq){
+  if(sq.alloc===0&&sq.people>0) return 'gap';
+  const hasHigh=S.risks.some(r=>r.owner===sq.id&&
+    (r.probability==='alta'||r.prob==='alta')&&r.status==='aberto');
+  if(sq.alloc>=sq.people*0.5&&!hasHigh) return 'ok';
+  return 'warn';
+}
+function healthColor(h){return h==='ok'?'var(--ok)':h==='warn'?'var(--warn)':'var(--gap)';}
+function scoreClass(r){
+  const p=r.probability||r.prob||'media';
+  const i=r.impact||'medio';
+  const pm={alta:3,media:2,baixa:1},im={alto:3,medio:2,baixo:1};
+  const sc=(pm[p]||2)*(im[i]||2);
+  return sc>=6?'critico':sc>=4?'alto':sc>=2?'medio':'baixo';
+}
+
+// ── RENDER ─────────────────────────────────────────────────────────────────
+let activePill=null;
+function togglePill(id){
+  const wasActive=activePill===id;
+  document.querySelectorAll('.detail-panel').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  activePill=null;
+  if(!wasActive){
+    activePill=id;
+    const panel=document.getElementById('dp-'+id);
+    const pill=document.querySelector('.pill[data-id="'+id+'"]');
+    if(panel) panel.classList.add('open');
+    if(pill) pill.classList.add('active');
+  }
+}
+
+function render(){
+  const {squads,groups,risks,extDeps,strategy,members}=S;
+  const gm=g=>groups[g]||DEF_GROUPS[g]||{name:g,color:'#6B6F80',faint:'rgba(107,111,128,.12)'};
+
+  // KPIs
+  const totalPeople=squads.reduce((a,s)=>a+(parseInt(s.people)||8),0);
+  const totalAlloc=members.length;
+  const allocPct=squads.length>0?Math.round(totalAlloc/squads.length*100/8):0;
+  const critRisks=risks.filter(r=>
+    (r.probability==='alta'||r.prob==='alta')||r.impact==='alto').length;
+  const extHigh=extDeps.filter(e=>e.impact==='alto').length;
+
+  const el=id=>document.getElementById(id);
+
+  el('kpis').innerHTML=[
+    {n:squads.length,l:'Squads',b:null},
+    {n:'~'+totalPeople,l:'Pessoas planejadas',b:null},
+    {n:totalAlloc+'/'+squads.length,l:'Membros alocados',
+     b:'<span class="kpi-badge '+(allocPct>=50?'badge-ok':allocPct>=25?'badge-warn':'badge-gap')+'">'+allocPct+'% alocado</span>'},
+    {n:critRisks,l:'Riscos críticos ou altos',
+     b:'<span class="kpi-badge '+(critRisks===0?'badge-ok':'badge-gap')+'">'+(critRisks===0?'Tudo ok':critRisks+' abertos')+'</span>'},
+    {n:extHigh,l:'Dependências externas — alto impacto',b:null}
+  ].map((k,i)=>'<div class="kpi"'+(i>0?' style="padding-left:32px"':'')+'>'+
+    '<div class="kpi-n">'+k.n+'</div>'+
+    '<div class="kpi-label">'+k.l+'</div>'+
+    (k.b||'')+
+  '</div>').join('<div class="kpi-divider"></div>');
+
+  // Squad map
+  const groupOrder=['A','B','C','R',...Object.keys(groups).filter(g=>!['A','B','C','R'].includes(g))];
+  el('squad-map').innerHTML=groupOrder.map(g=>{
+    const m=gm(g);
+    const gs=squads.filter(s=>(s.group||s.g)===g);
+    if(!gs.length) return '';
+    const pills=gs.map(sq=>{
+      const h=health(sq);
+      const hc=healthColor(h);
+      const bg=h==='gap'?'rgba(239,68,68,.07)':h==='warn'?'rgba(245,158,11,.07)':'rgba(16,185,129,.07)';
+      '<div class="pill" data-id="'+sq.id+'" style="background:'+bg+'">'+
+        '<span class="pill-id" style="color:'+m.color+'">'+sq.id+'</span>'+
+        '<span class="pill-name">'+(sq.name||'').substring(0,22)+'</span>'+
+        '<span class="pill-dot" style="background:'+hc+'"></span>'+
+        '</div>'+
+        '<div class="detail-panel" data-id="'+sq.id+'" id="dp-'+sq.id+'">'+
+          '<div class="detail-inner">'+
+            '<span class="detail-close" data-id="'+sq.id+'">fechar ✕</span>'+
+            '<div class="detail-grid">'+
+              '<div class="detail-stat"><span class="detail-stat-n">'+sq.alloc+'/'+sq.people+'</span><span class="detail-stat-l">Membros alocados</span></div>'+
+              '<div class="detail-stat"><span class="detail-stat-n">'+(sq.caps||0)+'</span><span class="detail-stat-l">Capabilities</span></div>'+
+              '<div class="detail-stat"><span class="detail-stat-n" style="color:'+(sq.riskCount>0?'var(--warn)':'var(--ok)')+'">'+sq.riskCount+'</span><span class="detail-stat-l">Riscos associados</span></div>'+
+            '</div>'+
+            '<div class="detail-mandate">'+(sq.mandate||'')+'</div>'+
+          '</div>'+
+        '</div>';
+    }).join('');
+    return '<div class="group-lane">'+
+      '<div class="lane-header">'+
+        '<div class="lane-color" style="background:'+m.color+'"></div>'+
+        '<span class="lane-name">'+g+' · '+m.name+'</span>'+
+        '<span class="lane-count">'+gs.length+' squads</span>'+
+      '</div>'+
+      '<div class="pills">'+pills+'</div>'+
+    '</div>';
+  }).join('');
+
+  // Risks
+  el('risk-list').innerHTML=risks.slice(0,6).map(r=>{
+    const sc=scoreClass(r);
+    const sc_color=sc==='critico'?'var(--gap)':sc==='alto'?'#EF4444':'var(--warn)';
+    return '<div class="risk-item">'+
+      '<div class="risk-sev" style="background:'+sc_color+'"></div>'+
+      '<div>'+
+        '<div class="risk-title">'+(r.title||'')+'</div>'+
+        '<div class="risk-meta">'+
+          '<span class="risk-pill r-'+sc+'">'+sc+'</span>'+
+          '<span>'+(r.category||r.cat||'')+'</span>'+
+          '<span style="color:var(--faint)">→ '+(r.owner||'')+'</span>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+
+  // Ext deps
+  el('ext-list').innerHTML=extDeps.slice(0,6).map(e=>
+    '<div class="ext-item">'+
+      '<span class="ext-imp ei-'+(e.impact||'medio')+'">'+(e.impact||'')+'</span>'+
+      '<div>'+
+        '<div class="ext-name">'+(e.name||'')+'</div>'+
+        '<div class="ext-squads">'+((e.squads||[]).join(' · '))+'</div>'+
+      '</div>'+
+    '</div>').join('');
+
+  // Strategy
+  el('strat-list').innerHTML=strategy.map(s=>
+    '<div class="strat-card">'+
+      '<div class="strat-eyebrow">'+(s.eyebrow||'')+'</div>'+
+      '<div class="strat-title">'+(s.title||'')+'</div>'+
+      '<div class="strat-cols">'+
+        '<div class="strat-col sc-before">'+
+          '<div class="strat-col-label">'+((s.before||{}).label||'Antes')+'</div>'+
+          '<ul>'+((s.before||{}).items||[]).map(i=>'<li>'+i+'</li>').join('')+'</ul>'+
+        '</div>'+
+        '<div class="strat-col sc-after">'+
+          '<div class="strat-col-label">'+((s.after||{}).label||'Depois')+'</div>'+
+          '<ul>'+((s.after||{}).items||[]).map(i=>'<li>'+i+'</li>').join('')+'</ul>'+
+        '</div>'+
+      '</div>'+
+    '</div>').join('');
+}
+
+// ── EVENT DELEGATION (avoids onclick/quote issues) ─────────────────────────
+document.addEventListener('click', function(e){
+  const pill=e.target.closest('.pill');
+  if(pill && pill.dataset.id){ togglePill(pill.dataset.id); return; }
+  const close=e.target.closest('.detail-close');
+  if(close && close.dataset.id){ togglePill(close.dataset.id); return; }
+});
+
+// ── SYNC BADGE ─────────────────────────────────────────────────────────────
+function setSyncBadge(ok,at){
+  const dot=document.getElementById('sync-dot');
+  const lbl=document.getElementById('sync-lbl');
+  if(!dot||!lbl) return;
+  dot.style.background=ok?'var(--ok)':'#EF4444';
+  const t=at?new Date(at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
+  lbl.textContent=ok?'Sync '+(t||'ao vivo'):'Sem conexão';
+}
+
+// ── SSE ────────────────────────────────────────────────────────────────────
+function startSSE(){
+  if(!fbToken) return;
+  if(sseConn){sseConn.close();sseConn=null;}
+  sseConn=new EventSource(FB_URL+'/state.json?auth='+fbToken);
+  sseConn.addEventListener('put',e=>{
+    try{
+      const msg=JSON.parse(e.data);
+      if(msg&&msg.data&&msg.data.squads){
+        applyFirebaseState(msg.data);
+        render();
+        setSyncBadge(true,msg.data.lastAt);
+      }
+    }catch(err){console.warn('SSE error:',err);}
+  });
+  sseConn.onerror=()=>{setSyncBadge(false);setTimeout(startSSE,8000);};
+}
+
+// ── LOGIN ──────────────────────────────────────────────────────────────────
+async function dashLogin(){
+  const email=document.getElementById('d-email').value.trim().toLowerCase();
+  const errEl=document.getElementById('d-err');
+  if(!email.endsWith('@bradesco.com.br')&&!email.endsWith('@bradesco.com')){
+    errEl.textContent='Apenas emails @bradesco.com.br são permitidos.';return;
+  }
+  const btn=document.querySelector('.dash-login-btn');
+  btn.textContent='Entrando...';btn.disabled=true;
+
+  sessionStorage.setItem('dash_user',email);
+  document.getElementById('login-layer').style.display='none';
+  document.getElementById('app-layer').style.display='';
+  document.getElementById('sync-user').textContent=email;
+
+  // Render immediately with defaults
+  render();
+
+  // Then try Firebase in background
+  try{
+    await fbSignIn();
+    const state=await fbGet('state');
+    applyFirebaseState(state);
+    render();
+    setSyncBadge(true,state&&state.lastAt?state.lastAt:null);
+    startSSE();
+  }catch(e){
+    console.warn('Firebase error:',e);
+    setSyncBadge(false);
+  }
+  btn.textContent='Entrar →';btn.disabled=false;
+}
+function dashLogout(){
+  sessionStorage.removeItem('dash_user');
+  if(sseConn){sseConn.close();sseConn=null;}
+  document.getElementById('login-layer').style.display='';
+  document.getElementById('app-layer').style.display='none';
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+async function init(){
+  const user=sessionStorage.getItem('dash_user');
+  if(user){
+    document.getElementById('login-layer').style.display='none';
+    document.getElementById('app-layer').style.display='';
+    document.getElementById('sync-user').textContent=user;
+
+    // Render with defaults IMMEDIATELY — never blank
+    render();
+
+    // Then fetch Firebase in background
+    try{
+      await fbSignIn();
+      const state=await fbGet('state');
+      applyFirebaseState(state);
+      render();
+      setSyncBadge(true,state&&state.lastAt?state.lastAt:null);
+      startSSE();
+    }catch(e){
+      console.warn('Firebase load error:',e);
+      setSyncBadge(false);
+    }
+  } else {
+    document.getElementById('login-layer').style.display='';
+    document.getElementById('app-layer').style.display='none';
+  }
+}
+
+document.getElementById('d-email').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('d-pass').focus();});
+document.getElementById('d-pass').addEventListener('keydown',e=>{if(e.key==='Enter')dashLogin();});
+init();
+</script>
+</div><!-- /app-layer -->
+</body>
+</html>
