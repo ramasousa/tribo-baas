@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tribo Bradesco as a Service</title>
+<style>
+:root{
+  --red:#CC092F;--red-dark:#900F15;--red-faint:#FBE9EC;
+  --ink:#0B0E18;--bg:#F7F5F2;--card:#FFFFFF;
+  --g900:#14161F;--g700:#3D4150;--g500:#6B6F80;--g300:#C7C5C0;--g200:#E4E1DC;--g100:#EFEDE8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --serif:Georgia,'Times New Roman',serif;
+  --mono:'SF Mono','Fira Code',Consolas,monospace;
+  --gA:#CC092F;--gA-f:#FBE9EC;
+  --gB:#4F46E5;--gB-f:#EEEDFC;
+  --gC:#1A8754;--gC-f:#E8F5EE;
+  --gR:#0EA5E9;--gR-f:#E0F2FE;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--g700);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── LOGIN ── */
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#0D0F1A 0%,#1a0a10 60%,#0D0F1A 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:44px 40px;width:100%;max-width:420px;backdrop-filter:blur(20px)}
+.login-brand{display:flex;align-items:center;gap:10px;margin-bottom:32px}
+.login-brand-name{font-family:var(--serif);font-weight:700;font-size:17px;color:#fff}
+.login-title{font-family:var(--serif);font-weight:700;font-size:24px;color:#fff;margin-bottom:8px}
+.login-sub{font-size:13.5px;color:rgba(255,255,255,.55);margin-bottom:28px;line-height:1.55}
+.login-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;display:block}
+.login-input{width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:#fff;font-size:14px;font-family:var(--sans);margin-bottom:14px;transition:border-color .15s}
+.login-input::placeholder{color:rgba(255,255,255,.3)}
+.login-input:focus{outline:none;border-color:rgba(204,9,47,.7)}
+.login-btn{width:100%;padding:12px;border-radius:10px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);margin-top:4px;transition:background .15s}
+.login-btn:hover{background:var(--red-dark)}
+.login-error{font-size:12px;color:#FCA5A5;margin-top:8px;min-height:18px;text-align:center}
+.login-footer{font-size:11.5px;color:rgba(255,255,255,.3);text-align:center;margin-top:24px}
+
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(247,245,242,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--g200)}
+.nav-row{max-width:1280px;margin:0 auto;padding:0 28px;height:56px;display:flex;align-items:center;gap:16px}
+.brand{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-weight:700;font-size:15px;color:var(--ink);white-space:nowrap;flex-shrink:0}
+.nav-links{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{font-size:12px;font-weight:600;color:var(--g500);text-decoration:none;padding:5px 10px;border-radius:6px;white-space:nowrap;cursor:pointer;transition:all .15s}
+.nav-links a:hover{color:var(--ink);background:var(--g100)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.nav-user{font-size:11.5px;color:var(--g500);display:flex;align-items:center;gap:6px}
+.nav-user-dot{width:7px;height:7px;border-radius:50%;background:#22C55E}
+.btn-nav{font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:1.5px solid var(--g200);background:var(--card);cursor:pointer;color:var(--g700);transition:all .15s;white-space:nowrap}
+.btn-nav:hover{border-color:var(--ink);color:var(--ink)}
+body.editing .btn-nav.edit-btn{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ── HERO ── */
+.hero{max-width:1280px;margin:0 auto;padding:52px 28px 36px}
+.eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red-dark);background:var(--red-faint);padding:5px 12px;border-radius:100px;margin-bottom:18px}
+.hero h1{font-family:var(--serif);font-weight:700;font-size:clamp(26px,3.4vw,46px);line-height:1.1;color:var(--ink)}
+.hero h1 em{font-style:italic;color:var(--red)}
+.hero p{font-size:14px;color:var(--g500);max-width:560px;margin-top:12px;line-height:1.65}
+.hero-stats{display:flex;gap:26px;margin-top:26px;flex-wrap:wrap}
+.hstat-n{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--ink);line-height:1}
+.hstat-l{font-size:11px;color:var(--g500);margin-top:3px}
+
+/* ── SECTION ── */
+.section{max-width:1280px;margin:0 auto;padding:0 28px;scroll-margin-top:72px}
+.section-head{margin:56px 0 20px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.section-head-left .seyebrow{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px}
+.section-head-left h2{font-family:var(--serif);font-weight:700;font-size:22px;color:var(--ink)}
+.section-head-left p{font-size:13px;color:var(--g500);margin-top:4px;max-width:520px}
+.group-badge{font-size:10.5px;font-weight:700;padding:4px 12px;border-radius:100px;border:1.5px solid}
+.add-squad-btn,.add-group-btn{font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:1.5px dashed var(--g300);background:none;cursor:pointer;color:var(--g500);display:none;align-items:center;gap:4px;transition:all .15s}
+.add-squad-btn:hover,.add-group-btn:hover{border-color:var(--ink);color:var(--ink)}
+body.editing .add-squad-btn,body.editing .add-group-btn{display:inline-flex}
+
+/* ── SQUAD CARDS ── */
+.squad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.squad-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:1024px){.squad-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.squad-grid,.squad-grid-2{grid-template-columns:1fr}}
+.squad-card{background:var(--card);border:1px solid var(--g200);border-radius:12px;overflow:hidden;transition:box-shadow .2s,transform .2s}
+.squad-card:hover{box-shadow:0 10px 24px rgba(11,14,24,.07);transform:translateY(-1px)}
+.squad-top{padding:18px 20px 14px;position:relative}
+.squad-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.squad-num{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;background:var(--accent-f);color:var(--accent);font-family:var(--mono);font-weight:700;font-size:11px;margin-bottom:9px}
+.squad-name{font-family:var(--serif);font-weight:700;font-size:16px;color:var(--ink);margin-bottom:4px;line-height:1.25}
+.squad-mandate{font-size:12px;color:var(--g500);line-height:1.5}
+.squad-meta{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;align-items:center}
+.squad-meta-item{font-size:10.5px;color:var(--g500)}
+.squad-meta-item b{color:var(--g900);font-weight:700}
+.squad-method{font-family:var(--mono);font-weight:700;font-size:10.5px}
+.squad-actions{margin-left:auto;display:none;gap:5px}
+body.editing .squad-actions{display:flex}
+.btn-edit,.btn-del{font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;border:none;cursor:pointer;line-height:1}
+.btn-edit{background:var(--g100);color:var(--g700)}
+.btn-edit:hover{background:var(--g200)}
+.btn-del{background:#FEF2F2;color:#EF4444}
+.btn-del:hover{background:#FEE2E2}
+.squad-toggle{padding:9px 20px;border-top:1px solid var(--g100);font-size:11px;font-weight:700;color:var(--accent);display:flex;align-items:center;justify-content:space-between;background:var(--g100);cursor:pointer;user-select:none}
+.squad-detail{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.squad-detail-inner{padding:20px 24px 24px}
+.sd-block{margin-bottom:16px}
+.sd-block:last-child{margin-bottom:0}
+.sd-label{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);margin-bottom:7px}
+.sd-list{list-style:none;font-size:12.5px;color:var(--g700);line-height:1.7}
+.sd-list li{padding-left:14px;position:relative}
+.sd-list li::before{content:'—';position:absolute;left:0;color:var(--accent)}
+.risk-item{display:flex;gap:8px;font-size:12.5px;color:var(--g700);line-height:1.55;margin-bottom:8px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:9px 12px}
+.premise-item{display:flex;gap:8px;font-size:12.5px;color:var(--g700);line-height:1.55;margin-bottom:8px;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:9px 12px}
+.run-card{background:var(--card);border:1px solid var(--g200);border-radius:12px;overflow:hidden;transition:box-shadow .2s}
+.run-card:hover{box-shadow:0 10px 24px rgba(11,14,24,.07)}
+.run-inner{display:grid;grid-template-columns:260px 1fr}
+@media(max-width:640px){.run-inner{grid-template-columns:1fr}}
+.run-left{background:var(--gR-f);border-right:1px solid var(--g200);padding:20px 22px;display:flex;flex-direction:column;justify-content:center;border-top:3px solid var(--gR)}
+.run-right{padding:18px 24px 14px}
+.run-toggle{padding:9px 20px;border-top:1px solid var(--g100);font-size:11px;font-weight:700;color:var(--gR);display:flex;align-items:center;justify-content:space-between;background:var(--gR-f);cursor:pointer;user-select:none}
+
+/* ── TEAM MEMBERS ── */
+.team-section{background:linear-gradient(135deg,#0D0F1A 0%,#1a0a10 55%,#0D0F1A 100%);border-radius:20px;padding:40px;overflow:hidden;position:relative}
+.team-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A78BFA;margin-bottom:14px}
+.team-title{font-family:var(--serif);font-weight:700;font-size:22px;color:#fff;margin-bottom:8px}
+.team-sub{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:28px;line-height:1.55;max-width:520px}
+.team-header-actions{display:none;margin-bottom:20px}
+body.editing .team-header-actions{display:flex;gap:8px}
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.member-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;position:relative}
+.member-card:hover,.member-card.active{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);transform:translateY(-2px)}
+.member-role-badge{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:10px}
+.member-name{font-weight:700;font-size:14px;color:#fff;margin-bottom:3px;line-height:1.3}
+.member-title{font-size:11.5px;color:rgba(255,255,255,.5);line-height:1.4}
+.member-squad-tag{font-size:10px;font-weight:700;margin-top:10px;padding:3px 8px;border-radius:100px;display:inline-block;font-family:var(--mono)}
+.member-detail{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px;margin-top:12px;font-size:12px;color:rgba(255,255,255,.7);display:none;line-height:1.6}
+.member-card.active .member-detail{display:block}
+.member-edit-btns{position:absolute;top:8px;right:8px;display:none;gap:4px}
+body.editing .member-edit-btns{display:flex}
+.btn-mem-edit,.btn-mem-del{font-size:10px;padding:3px 7px;border-radius:5px;border:none;cursor:pointer;font-weight:700}
+.btn-mem-edit{background:rgba(255,255,255,.15);color:#fff}
+.btn-mem-del{background:rgba(239,68,68,.25);color:#FCA5A5}
+
+/* ── FLOW ── */
+.flow-wrap{background:var(--card);border:1px solid var(--g200);border-radius:16px;padding:24px;overflow-x:auto}
+.flow-container{min-width:880px}
+.flow-node{cursor:pointer}
+.flow-node rect{transition:filter .15s,stroke-width .15s}
+.flow-node:hover rect,.flow-node.active rect{filter:brightness(.94);stroke-width:2.5}
+.flow-arrow{transition:opacity .2s}
+.flow-arrow.dimmed{opacity:.06}
+.flow-arrow.hi{stroke-width:2.5;opacity:1!important}
+.flow-legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--g100)}
+.flow-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--g500)}
+.flow-legend-line{width:22px;height:2px;border-radius:1px}
+.flow-info{margin-top:12px;padding:14px 16px;background:var(--g100);border-radius:9px;font-size:12.5px;display:none}
+.flow-info.show{display:block}
+
+/* ── AUTONOMY ── */
+.autonomy-block{background:linear-gradient(135deg,#0D0F1A 0%,#1a0a10 55%,#0D0F1A 100%);border-radius:18px;padding:40px 44px;color:#fff;margin-bottom:24px}
+.autonomy-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#A78BFA;margin-bottom:14px}
+.autonomy-block h3{font-family:var(--serif);font-weight:700;font-size:22px;line-height:1.2;margin-bottom:12px;max-width:500px}
+.autonomy-block p{font-size:13.5px;color:rgba(255,255,255,.6);line-height:1.65;max-width:560px;margin-bottom:20px}
+.autonomy-compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:580px}
+@media(max-width:640px){.autonomy-compare{grid-template-columns:1fr}}
+.autonomy-col{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:14px 16px}
+.autonomy-col-label{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.autonomy-col.before .autonomy-col-label{color:#FCA5A5}
+.autonomy-col.after .autonomy-col-label{color:#86EFAC}
+.autonomy-col ul{list-style:none;font-size:12px;color:rgba(255,255,255,.72);line-height:1.8}
+.autonomy-col li{padding-left:13px;position:relative}
+.autonomy-col.before li::before{content:'✕';position:absolute;left:0;color:#FCA5A5;font-size:9px}
+.autonomy-col.after li::before{content:'✓';position:absolute;left:0;color:#86EFAC;font-size:9px}
+
+/* ── TABLES / RISKS ── */
+.tools-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;border:1px solid var(--g200)}
+.tools-table th{text-align:left;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);padding:10px 14px;background:var(--g100);border-bottom:1px solid var(--g200)}
+.tools-table td{padding:11px 14px;font-size:12.5px;color:var(--g700);border-bottom:1px solid var(--g100)}
+.tools-table tr:last-child td{border-bottom:none}
+.tool-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:100px}
+.risk-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:640px){.risk-grid{grid-template-columns:1fr}}
+.risk-card{background:var(--card);border:1px solid var(--g200);border-left:3px solid var(--red);border-radius:10px;padding:16px 18px}
+.risk-card h4{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.risk-card p{font-size:12px;color:var(--g500);line-height:1.55}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(11,14,24,.55);z-index:1000;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-overlay.show{display:flex}
+.modal{background:var(--card);border-radius:16px;width:100%;max-width:640px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.3)}
+.modal-sm{max-width:440px}
+.modal-header{padding:20px 24px 14px;border-bottom:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:1}
+.modal-title{font-family:var(--serif);font-weight:700;font-size:17px;color:var(--ink)}
+.modal-close{width:30px;height:30px;border-radius:7px;border:none;background:var(--g100);cursor:pointer;font-size:15px;color:var(--g500);display:flex;align-items:center;justify-content:center}
+.modal-body{padding:18px 24px}
+.form-row{margin-bottom:14px}
+.form-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--g500);margin-bottom:6px;display:block}
+.form-input,.form-textarea,.form-select{width:100%;padding:9px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:var(--sans);color:var(--ink);background:var(--card);transition:border-color .15s}
+.form-input:focus,.form-textarea:focus,.form-select:focus{outline:none;border-color:var(--red)}
+.form-textarea{resize:vertical;line-height:1.5}
+.form-hint{font-size:11px;color:var(--g400);margin-top:4px}
+.form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-footer{padding:14px 24px;border-top:1px solid var(--g200);display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;bottom:0;background:var(--card)}
+.btn-primary{font-size:13px;font-weight:700;padding:9px 18px;border-radius:8px;border:none;background:var(--red);color:#fff;cursor:pointer}
+.btn-primary:hover{background:var(--red-dark)}
+.btn-secondary{font-size:13px;font-weight:600;padding:9px 14px;border-radius:8px;border:1.5px solid var(--g200);background:none;cursor:pointer;color:var(--g700)}
+.btn-danger{font-size:13px;font-weight:700;padding:9px 14px;border-radius:8px;border:none;background:#FEF2F2;color:#EF4444;cursor:pointer}
+.btn-danger:hover{background:#FEE2E2}
+.color-palette{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.color-swatch{width:28px;height:28px;border-radius:7px;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.color-swatch.selected{border-color:var(--ink);transform:scale(1.15)}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:11px 16px;border-radius:9px;font-size:13px;font-weight:600;z-index:2000;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none;max-width:320px}
+.toast.show{opacity:1;transform:translateY(0)}
+
+footer{border-top:1px solid var(--g200);padding:28px;text-align:center;font-size:12px;color:var(--g300);margin-top:64px}
+/* ── DEPENDENCY TAGS ── */
+.dep-tag{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;margin:2px;border:1px solid}
+.dep-interno{background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE}
+.dep-externo{background:#F0FDF4;color:#166534;border-color:#BBF7D0}
+.dep-select-wrap{border:1.5px solid var(--g200);border-radius:8px;max-height:180px;overflow-y:auto;padding:8px}
+.dep-check-item{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;cursor:pointer;font-size:12.5px}
+.dep-check-item:hover{background:var(--g100)}
+.dep-check-item input{accent-color:var(--red);width:14px;height:14px;cursor:pointer}
+.dep-cat-label{font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--g400);padding:6px 6px 2px}
+.dep-search{width:100%;padding:7px 10px;border:1.5px solid var(--g200);border-radius:7px;font-size:12.5px;font-family:var(--sans);margin-bottom:6px}
+.dep-search:focus{outline:none;border-color:var(--red)}
+.member-count-badge{font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:100px;background:var(--g100);color:var(--g700)}
+.member-count-badge.gap{background:#FEF3C7;color:#92400E}
+.member-count-badge.full{background:#D1FAE5;color:#065F46}
+
+/* ── RISK CARDS V2 ── */
+.risk-grid-v2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:768px){.risk-grid-v2{grid-template-columns:1fr}}
+.risk-card-v2{background:var(--card);border:1px solid var(--g200);border-radius:12px;padding:18px 20px;position:relative}
+.risk-header-v2{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px}
+.risk-badges{display:flex;gap:5px;flex-wrap:wrap}
+.risk-badge{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:100px;letter-spacing:.04em}
+.prob-alta{background:#FEE2E2;color:#991B1B}
+.prob-media{background:#FEF3C7;color:#92400E}
+.prob-baixa{background:#D1FAE5;color:#065F46}
+.imp-alto{background:#FCE7F3;color:#9D174D}
+.imp-medio{background:#EDE9FE;color:#5B21B6}
+.imp-baixo{background:#E0F2FE;color:#075985}
+.risk-score-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px}
+.score-critico{background:#991B1B;color:#fff}
+.score-alto{background:#DC2626;color:#fff}
+.score-medio{background:#D97706;color:#fff}
+.score-baixo{background:#059669;color:#fff}
+.risk-card-v2 h4{font-size:13.5px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.risk-card-v2 .risk-desc{font-size:12px;color:var(--g500);line-height:1.55;margin-bottom:10px}
+.risk-mitigations{font-size:12px;margin-bottom:10px}
+.risk-mitigations b{color:var(--g700);font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.risk-mitigations ul{margin:4px 0 0 14px;color:var(--g600);line-height:1.7}
+.risk-footer-v2{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--g100)}
+.risk-footer-v2 span{font-size:11px;color:var(--g500)}
+.risk-status-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;margin-left:auto}
+.status-aberto{background:#FEE2E2;color:#991B1B}
+.status-mitigado{background:#D1FAE5;color:#065F46}
+.status-aceito{background:#EDE9FE;color:#5B21B6}
+.risk-cat-badge{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--g100);color:var(--g500)}
+.add-risk-btn{font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;border:1.5px dashed var(--g300);background:none;cursor:pointer;color:var(--g500);display:none;margin-top:14px;transition:all .15s}
+.add-risk-btn:hover{border-color:var(--red);color:var(--red)}
+body.editing .add-risk-btn{display:inline-flex;align-items:center;gap:5px}
+.risk-edit-btns{position:absolute;top:10px;right:10px;display:none;gap:4px}
+body.editing .risk-edit-btns{display:flex}
+
+/* ── STRATEGIC CARDS ── */
+.strategic-add-btn{font-size:12px;font-weight:700;padding:6px 12px;border-radius:7px;border:1.5px dashed var(--g300);background:none;cursor:pointer;color:var(--g500);display:none;transition:all .15s}
+.strategic-add-btn:hover{border-color:var(--red);color:var(--red)}
+body.editing .strategic-add-btn{display:inline-flex;align-items:center;gap:5px;color:var(--g500);border-color:var(--g300)}
+.autonomy-block-wrap{position:relative;margin-bottom:16px}
+.strategic-edit-btns{position:absolute;top:12px;right:12px;display:none;gap:4px}
+body.editing .strategic-edit-btns{display:flex}
+.btn-strategic-edit,.btn-strategic-del{font-size:11px;font-weight:700;padding:4px 9px;border-radius:6px;border:none;cursor:pointer}
+.btn-strategic-edit{background:rgba(255,255,255,.2);color:#fff}
+.btn-strategic-del{background:rgba(239,68,68,.3);color:#FCA5A5}
+
+/* ── TOOLS EDITABLE ── */
+.tools-add-btn{font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;border:1.5px dashed var(--g300);background:none;cursor:pointer;color:var(--g500);display:none;margin-top:12px;transition:all .15s}
+.tools-add-btn:hover{border-color:var(--ink);color:var(--ink)}
+body.editing .tools-add-btn{display:inline-flex;align-items:center;gap:5px}
+.tool-edit-btns{display:none;gap:4px}
+body.editing .tool-edit-btns{display:flex}
+
+/* ── DUAL FLOW TABS ── */
+.flow-tabs{display:flex;gap:4px;margin-bottom:20px;background:var(--g100);border-radius:9px;padding:3px}
+.flow-tab{flex:1;text-align:center;font-size:12.5px;font-weight:700;padding:8px;border-radius:7px;cursor:pointer;color:var(--g500);border:none;background:none;transition:all .2s}
+.flow-tab.active{background:var(--card);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.flow-view{display:none}
+.flow-view.active{display:block}
+.ext-dep-table{width:100%;border-collapse:collapse;font-size:13px}
+.ext-dep-table th{text-align:left;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--g500);padding:10px 14px;background:var(--g100);border-bottom:1px solid var(--g200)}
+.ext-dep-table td{padding:12px 14px;border-bottom:1px solid var(--g100);vertical-align:top}
+.ext-dep-table tr:last-child td{border-bottom:none}
+.impact-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px}
+.imp-alto-badge{background:#FEE2E2;color:#991B1B}
+.imp-medio-badge{background:#FEF3C7;color:#92400E}
+.imp-baixo-badge{background:#D1FAE5;color:#065F46}
+.ext-add-btn{font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;border:1.5px dashed var(--g300);background:none;cursor:pointer;color:var(--g500);display:none;margin-top:12px;transition:all .15s}
+body.editing .ext-add-btn{display:inline-flex;align-items:center;gap:5px}
+
+/* ── TEMPLATE BUTTON ── */
+.btn-template{font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:7px;border:1.5px solid var(--g200);background:var(--card);cursor:pointer;color:var(--g500);transition:all .15s}
+.btn-template:hover{color:var(--ink);border-color:var(--ink)}
+
+</style>
+</head>
+<body>
+<!-- LOGIN OVERLAY -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-box">
+    <div class="login-brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M5 11.5L12 3l7 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3.5 15L12 6.5l8.5 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+        <path d="M9.5 15.5v5.5M14.5 15.5v5.5" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      <span class="login-brand-name">Bradesco as a Service</span>
+    </div>
+    <div class="login-title">Acesso restrito</div>
+    <div class="login-sub">Este material é confidencial e de uso interno. Utilize seu e-mail corporativo Bradesco para acessar.</div>
+    <label class="login-label">E-mail corporativo</label>
+    <input class="login-input" id="login-email" type="email" placeholder="seu.nome@bradesco.com.br" autocomplete="email"/>
+    <label class="login-label">Senha</label>
+    <input class="login-input" id="login-pass" type="password" placeholder="Sua senha" autocomplete="current-password"/>
+    <button class="login-btn" onclick="doLogin()">Entrar →</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-footer">Tribo BaaS · Uso exclusivo para colaboradores Bradesco</div>
+  </div>
+</div>
+
+<!-- DELETE CONFIRM MODAL -->
+<div class="modal-overlay" id="del-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">⚠️ Confirmar exclusão</span>
+      <button class="modal-close" onclick="closeDelModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--g700);line-height:1.6;margin-bottom:16px">
+        Você está prestes a excluir a squad <b id="del-target-name" style="color:var(--ink)"></b>.<br>
+        Esta ação <b>não pode ser desfeita</b> e será registrada.
+      </p>
+      <div class="form-row">
+        <label class="form-label">Seu nome completo (registro de auditoria)</label>
+        <input class="form-input" id="del-person-name" placeholder="Digite seu nome completo para confirmar"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeDelModal()">Cancelar</button>
+      <button class="btn-danger" onclick="executeDelete()">Confirmar exclusão</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT SQUAD MODAL -->
+<div class="modal-overlay" id="squad-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="squad-modal-title">Editar Squad</span>
+      <button class="modal-close" onclick="closeSquadModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">ID da Squad</label>
+          <input class="form-input" id="f-id" placeholder="Ex: A1, B3, X1"/>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Grupo</label>
+          <select class="form-select" id="f-group"></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Nome da Squad</label>
+        <input class="form-input" id="f-name" placeholder="Ex: Plataforma & Identidade"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Mandato</label>
+        <input class="form-input" id="f-mandate" placeholder="Frase curta descrevendo o propósito"/>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">Metodologia</label>
+          <select class="form-select" id="f-method">
+            <option value="Scrum">Scrum</option>
+            <option value="Kanban">Kanban</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Nº de pessoas</label>
+          <input class="form-input" type="number" id="f-people" min="1" max="30" value="8"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Capabilities</label>
+        <textarea class="form-textarea" id="f-caps" rows="5" placeholder="Uma capability por linha"></textarea>
+        <div class="form-hint">Uma por linha</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Label da seção de contexto</label>
+        <input class="form-input" id="f-scope-label" placeholder="Ex: Escopo coberto hoje no protótipo"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Contexto / Escopo</label>
+        <textarea class="form-textarea" id="f-scope" rows="4" placeholder="Um item por linha"></textarea>
+        <div class="form-hint">Um por linha</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Dependências desta squad</label>
+        <input class="dep-search" id="dep-search" placeholder="Filtrar..." oninput="filterDeps(this.value)" style="width:100%;padding:7px 10px;border:1.5px solid var(--g200);border-radius:7px;font-size:12.5px;margin-bottom:6px"/>
+        <div class="dep-select-wrap" id="dep-select-wrap"></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Dependências desta squad</label>
+        <input id="dep-search" placeholder="Filtrar dependências..." oninput="filterDeps(this.value)" style="width:100%;padding:7px 10px;border:1.5px solid var(--g200);border-radius:7px;font-size:12.5px;margin-bottom:6px;font-family:var(--sans)"/>
+        <div class="dep-select-wrap" id="dep-select-wrap" style="border:1.5px solid var(--g200);border-radius:8px;max-height:150px;overflow-y:auto;padding:6px"></div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Perfis</label>
+        <input class="form-input" id="f-profiles" placeholder="Ex: 1 PM · 2 backend · 1 tech lead"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Riscos</label>
+        <textarea class="form-textarea" id="f-risks" rows="4" placeholder="Um risco por linha"></textarea>
+        <div class="form-hint">Um por linha</div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Premissas</label>
+        <textarea class="form-textarea" id="f-premises" rows="4" placeholder="Uma premissa por linha"></textarea>
+        <div class="form-hint">Uma por linha</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="f-del-btn" onclick="askDelete()">Excluir squad</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeSquadModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveSquadModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD GROUP MODAL -->
+<div class="modal-overlay" id="group-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title">Novo Grupo de Squads</span>
+      <button class="modal-close" onclick="closeGroupModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">ID do Grupo</label>
+          <input class="form-input" id="g-id" placeholder="Ex: D, E, X" maxlength="3"/>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Metodologia padrão</label>
+          <select class="form-select" id="g-method">
+            <option value="Scrum">Scrum</option>
+            <option value="Kanban">Kanban</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Nome do Grupo</label>
+        <input class="form-input" id="g-name" placeholder="Ex: Dados & Analytics"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Descrição</label>
+        <input class="form-input" id="g-desc" placeholder="Uma frase sobre o propósito do grupo"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Cor</label>
+        <div class="color-palette" id="color-palette">
+          <div class="color-swatch selected" data-color="#CC092F" data-faint="#FBE9EC" style="background:#CC092F" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#4F46E5" data-faint="#EEEDFC" style="background:#4F46E5" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#1A8754" data-faint="#E8F5EE" style="background:#1A8754" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#0EA5E9" data-faint="#E0F2FE" style="background:#0EA5E9" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#D97706" data-faint="#FEF9E8" style="background:#D97706" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#7C3AED" data-faint="#F3F0FF" style="background:#7C3AED" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#0D9488" data-faint="#F0FDFA" style="background:#0D9488" onclick="selectColor(this)"></div>
+          <div class="color-swatch" data-color="#E11D48" data-faint="#FFF1F4" style="background:#E11D48" onclick="selectColor(this)"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="g-del-btn" onclick="deleteGroup()" style="display:none">Excluir grupo</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeGroupModal()">Cancelar</button>
+        <button class="btn-primary" id="g-save-btn" onclick="saveGroupModal()">Criar Grupo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MEMBER MODAL -->
+<div class="modal-overlay" id="member-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="member-modal-title">Membro da Tribo</span>
+      <button class="modal-close" onclick="closeMemberModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Nome completo</label>
+        <input class="form-input" id="m-name" placeholder="Nome do profissional"/>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row">
+          <label class="form-label">Papel / Role</label>
+          <select class="form-select" id="m-role">
+            <option value="TTL">TTL — Tribo Tech Lead</option>
+            <option value="TPL">TPL — Tribo Product Lead</option>
+            <option value="AC">AC — Agile Coach</option>
+            <option value="DIR">Diretor</option>
+            <option value="SUPESR">Superintendente Sênior</option>
+            <option value="SUPE">Superintendente</option>
+            <option value="TL">Tech Lead</option>
+            <option value="PM">Product Manager</option>
+            <option value="ENG">Engenheiro</option>
+            <option value="OUTRO">Outro</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Squad (opcional)</label>
+          <select class="form-select" id="m-squad">
+            <option value="">— Nenhuma específica —</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Título / Cargo</label>
+        <input class="form-input" id="m-title" placeholder="Ex: Head de Tecnologia"/>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Área de atuação</label>
+        <input class="form-input" id="m-area" placeholder="Ex: Plataforma & Identidade"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="m-del-btn" onclick="askDeleteMember()">Remover</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeMemberModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveMemberModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- DEPENDENCY CATALOG MODAL -->
+<div class="modal-overlay" id="dep-catalog-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">🔗 Catálogo de Dependências</span>
+      <button class="modal-close" onclick="closeDepCatalog()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--g500);margin-bottom:16px">Cadastre aqui todas as dependências que as squads podem ter — sistemas internos, parceiros, órgãos regulatórios, plataformas externas.</p>
+      <div id="dep-catalog-list"></div>
+      <div style="border-top:1px solid var(--g200);margin-top:16px;padding-top:16px">
+        <div class="form-row-2">
+          <div class="form-row"><label class="form-label">Nome</label><input class="form-input" id="dep-new-name" placeholder="Ex: BACEN / Open Finance"/></div>
+          <div class="form-row"><label class="form-label">Categoria</label><input class="form-input" id="dep-new-cat" placeholder="Ex: Regulatório"/></div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-row"><label class="form-label">Tipo</label>
+            <select class="form-select" id="dep-new-type">
+              <option value="interno">Interno</option>
+              <option value="externo">Externo</option>
+            </select>
+          </div>
+          <div class="form-row"><label class="form-label">Impacto (externas)</label>
+            <select class="form-select" id="dep-new-impact">
+              <option value="alto">Alto</option>
+              <option value="medio">Médio</option>
+              <option value="baixo">Baixo</option>
+            </select>
+          </div>
+          <div class="form-row" style="display:flex;align-items:flex-end">
+            <button class="btn-primary" style="width:100%" onclick="addDepToCatalog()">＋ Adicionar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer"><div></div><button class="btn-secondary" onclick="closeDepCatalog()">Fechar</button></div>
+  </div>
+</div>
+
+<!-- RISK EDIT MODAL -->
+<div class="modal-overlay" id="risk-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="risk-modal-title">Novo Risco</span>
+      <button class="modal-close" onclick="closeRiskModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Título</label><input class="form-input" id="r-title" placeholder="Nome do risco"/></div>
+      <div class="form-row"><label class="form-label">Descrição</label><textarea class="form-textarea" id="r-desc" rows="3" placeholder="Descreva o risco em detalhes"></textarea></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Categoria</label>
+          <select class="form-select" id="r-cat">
+            <option>Técnico</option><option>Segurança</option><option>Arquitetura</option>
+            <option>Operacional</option><option>Regulatório</option><option>Organizacional</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">Responsável (Squad ID)</label><input class="form-input" id="r-owner" placeholder="Ex: A2"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Probabilidade</label>
+          <select class="form-select" id="r-prob">
+            <option value="alta">Alta (&gt;70%)</option>
+            <option value="media">Média (30–70%)</option>
+            <option value="baixa">Baixa (&lt;30%)</option>
+          </select>
+        </div>
+        <div class="form-row"><label class="form-label">Impacto</label>
+          <select class="form-select" id="r-impact">
+            <option value="alto">Alto</option>
+            <option value="medio">Médio</option>
+            <option value="baixo">Baixo</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Prazo de acompanhamento</label><input class="form-input" type="date" id="r-deadline"/></div>
+        <div class="form-row"><label class="form-label">Status</label>
+          <select class="form-select" id="r-status">
+            <option value="aberto">Aberto</option>
+            <option value="mitigado">Mitigado</option>
+            <option value="aceito">Aceito</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row"><label class="form-label">Ações mitigatórias</label>
+        <textarea class="form-textarea" id="r-mitigations" rows="4" placeholder="Uma ação por linha"></textarea>
+        <div class="form-hint">Uma ação por linha</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="r-del-btn" onclick="deleteRisk()" style="display:none">Excluir</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeRiskModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveRiskModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STRATEGIC CARD EDIT MODAL -->
+<div class="modal-overlay" id="strategic-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="strategic-modal-title">Card Estratégico</span>
+      <button class="modal-close" onclick="closeStrategicModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Eyebrow (ex: ⚡ Independência)</label><input class="form-input" id="s-eyebrow"/></div>
+      <div class="form-row"><label class="form-label">Título</label><input class="form-input" id="s-title" placeholder="Frase de impacto"/></div>
+      <div class="form-row"><label class="form-label">Descrição</label><textarea class="form-textarea" id="s-desc" rows="3"></textarea></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Label coluna "Antes"</label><input class="form-input" id="s-before-label" placeholder="Ex: Hoje — com Axway"/></div>
+        <div class="form-row"><label class="form-label">Label coluna "Depois"</label><input class="form-input" id="s-after-label" placeholder="Ex: Com esta proposta"/></div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Itens "Antes"</label><textarea class="form-textarea" id="s-before-items" rows="5" placeholder="Um item por linha"></textarea></div>
+        <div class="form-row"><label class="form-label">Itens "Depois"</label><textarea class="form-textarea" id="s-after-items" rows="5" placeholder="Um item por linha"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="s-del-btn" onclick="deleteStrategicCard()" style="display:none">Excluir</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeStrategicModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveStrategicModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOOL EDIT MODAL -->
+<div class="modal-overlay" id="tool-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="tool-modal-title">Ferramenta / Pré-requisito</span>
+      <button class="modal-close" onclick="closeToolModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Camada</label><input class="form-input" id="t-layer" placeholder="Ex: Gateway, Identidade, Cloud"/></div>
+      <div class="form-row"><label class="form-label">Ferramenta / Decisão</label><input class="form-input" id="t-tool" placeholder="Ex: Apigee (MCP-native) — POC paralela"/></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Squad</label><input class="form-input" id="t-squad" placeholder="Ex: A5"/></div>
+        <div class="form-row"><label class="form-label">Para quê</label><input class="form-input" id="t-purpose" placeholder="Descrição breve"/></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="t-del-btn" onclick="deleteTool()" style="display:none">Excluir</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeToolModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveToolModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXTERNAL DEP EDIT MODAL -->
+<div class="modal-overlay" id="extdep-overlay">
+  <div class="modal modal-sm">
+    <div class="modal-header">
+      <span class="modal-title" id="extdep-modal-title">Dependência Externa</span>
+      <button class="modal-close" onclick="closeExtDepModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row"><label class="form-label">Nome</label><input class="form-input" id="ed-name" placeholder="Ex: BACEN / Open Finance"/></div>
+      <div class="form-row-2">
+        <div class="form-row"><label class="form-label">Categoria</label><input class="form-input" id="ed-cat" placeholder="Ex: Regulatório"/></div>
+        <div class="form-row"><label class="form-label">Impacto</label>
+          <select class="form-select" id="ed-impact">
+            <option value="alto">Alto</option><option value="medio">Médio</option><option value="baixo">Baixo</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row"><label class="form-label">Descrição / Risco associado</label><textarea class="form-textarea" id="ed-desc" rows="3"></textarea></div>
+      <div class="form-row"><label class="form-label">Squads afetadas (IDs, um por linha)</label><textarea class="form-textarea" id="ed-squads" rows="3" placeholder="Ex:\nB3\nB2"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-danger" id="ed-del-btn" onclick="deleteExtDep()" style="display:none">Excluir</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-secondary" onclick="closeExtDepModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveExtDepModal()">Salvar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+
+<!-- NAV -->
+<nav class="nav" id="main-nav" style="display:none">
+  <div class="nav-row">
+    <div class="brand">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+        <path d="M5 11.5L12 3l7 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3.5 15L12 6.5l8.5 8.5" stroke="#CC092F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity=".5"/>
+        <path d="M9.5 15.5v5.5M14.5 15.5v5.5" stroke="#0B0E18" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+      Bradesco as a Service
+    </div>
+    <div class="nav-links" id="nav-links"></div>
+    <div class="nav-right">
+      <span id="sync-badge" style="font-size:11px;color:#9CA3AF;white-space:nowrap">⚪ Local</span>
+      <div class="nav-user"><span class="nav-user-dot"></span><span id="nav-user-email"></span></div>
+      <button class="btn-template" onclick="generateTemplate()" title="Gerar template para nova tribo">📄 Template</button>
+      <button class="add-squad-btn" onclick="openDepCatalog()" title="Gerenciar catálogo de dependências" >🔗 Dependências</button>
+      <button class="btn-nav edit-btn" onclick="toggleEditMode()" id="edit-btn">✏️ Editar</button>
+      <button class="btn-nav" onclick="doLogout()">Sair</button>
+    </div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div id="main-content" style="display:none">
+  <header class="hero">
+    <div class="eyebrow"><span style="width:6px;height:6px;border-radius:50%;background:var(--red);display:inline-block;margin-right:2px"></span>Bradesco as a Service · Visão Consolidada da Tribo · <b>v6</b></div>
+    <h1><span id="hero-squad-count">Treze</span> squads. Uma <em>tribo única</em>.</h1>
+    <p>Visão consolidada de toda a Tribo. Clique em <b>✏️ Editar</b> para modificar, adicionar ou excluir squads, grupos e membros. Todas as alterações são salvas automaticamente no navegador.</p>
+    <div class="hero-stats" id="hero-stats"></div>
+  </header>
+  <div id="sections-root"></div>
+  <footer>Tribo Bradesco as a Service · IndexedDB · <span id="footer-user"></span></footer>
+</div>
+<script>
+// ═══ DEFAULTS ═══
+const DEFAULT_GROUPS={
+  A:{name:'Developer Portal',color:'#CC092F',faint:'#FBE9EC',desc:'A porta de entrada técnica do banco — onde parceiros descobrem, testam e integram os produtos.'},
+  B:{name:'Produtos de Crédito',color:'#4F46E5',faint:'#EEEDFC',desc:'Uma squad por produto — autonomia de domínio, dono do ciclo de vida completo da API.'},
+  C:{name:'White Label BaaS',color:'#1A8754',faint:'#E8F5EE',desc:'Transforma os produtos de crédito em experiências distribuíveis sob a marca de qualquer parceiro.'},
+  R:{name:'Run — Operação',color:'#0EA5E9',faint:'#E0F2FE',desc:'Garante o pleno funcionamento de clientes já integrados em qualquer produto. Kanban.'}
+};
+const DEFAULT_MEMBERS=[
+  {id:'m1',name:'',role:'TTL',title:'Tribo Tech Lead',area:'Tecnologia',squadId:''},
+  {id:'m2',name:'',role:'TPL',title:'Tribo Product Lead',area:'Produtos',squadId:''},
+  {id:'m3',name:'',role:'AC',title:'Agile Coach',area:'Agilidade',squadId:''},
+];
+const DEFAULT_SQUADS=[
+  {id:'A1',group:'A',name:'Plataforma & Identidade',mandate:'Login, credenciais, console, design system, dark mode e i18n.',methodology:'Scrum',people:8,capabilities:['Autenticação OAuth2 + Azure AD/Entra ID + MFA','Gestão de sessão e estado (logado / visitante / deslogado)','Cadastro, geração e ciclo de vida de credenciais','Console do desenvolvedor (métricas, logs, Apps, webhooks)','Dark mode, i18n PT/EN, acessibilidade, design system'],scopeLabel:'Escopo coberto hoje no protótipo',scope:['Login com Azure AD, MFA auto-submit, wizard de credenciais (4 passos)','Console, gate de acesso ao BaaS+IA, tour guiado interativo','Toggle dark/light, toggle PT/EN (69 elementos traduzidos)'],profiles:'1 PM · 2 backend (Identity/IAM) · 2 frontend (design system) · 1 segurança/AppSec · 1 designer · 1 tech lead',risks:['Maior risco do programa: integração real com Azure AD/Entra ID em produção exige alinhamento com time de Identity corporativo, fora do controle da squad.','MFA toca compliance/segurança — atraso de AppSec trava as demais squads.'],premises:['Começa 2–3 sprints antes das demais squads.','Design system é definido por esta squad e consumido pelas demais.']},
+  {id:'A2',group:'A',name:'Produtos Financeiros (Docs)',mandate:'Documentação de API para CaaS, PIX, Seguros, Consórcio e Débito Veicular.',methodology:'Scrum',people:8,capabilities:['API Reference com exemplos em cURL/Node/Python/Java','Sandbox sintético (CNPJ/CPF com cenário controlável)','Idempotência, Rate Limits, Migração Sandbox→Produção, Webhooks replay','8 cenários de diagnóstico de erro por causa raiz','Débito Veicular multi-UF (discriminated union)'],scopeLabel:'Escopo coberto hoje no protótipo',scope:['CaaS, PIX, Seguros, Consórcio — 15 endpoints documentados','Débito Veicular REST+gRPC com SP/RJ/MG/BA e guia para novos estados'],profiles:'1 PM · 3 backend · 2 technical writers · 1 QA · 1 tech lead',risks:['Maior volume de conteúdo — risco de doc desatualizar mais rápido que as squads revisam.','Depende de specs OpenAPI reais dos times de produto.'],premises:['Specs OpenAPI 3.1 existem ou são entregues antes do início da squad.','Padrão de 4 linguagens é oficial — todo endpoint segue sem exceção.']},
+  {id:'A3',group:'A',name:'BaaS + IA & Inovação',mandate:'MCP Server, gRPC, chatbot IA real, vitrine pública — o diferencial competitivo.',methodology:'Scrum',people:8,capabilities:['MCP Server (Claude, GPT, Gemini) — 7 tools','gRPC multi-estado para alta frequência','Chatbot com IA real (AI Gateway obrigatório)','Vitrine pública com catálogo, busca e tour guiado'],scopeLabel:'Escopo coberto hoje no protótipo',scope:['BaaS+MCP com gate de login','gRPC streaming bidirecional para Débito Veicular','Vitrine com 15 cards e tour guiado de 7 passos'],profiles:'1 PM · 2 backend IA/LLM · 1 backend gRPC · 2 frontend · 1 MCP specialist · 1 tech lead',risks:['Alto risco técnico: chatbot com LLM exige AI Gateway — chave nunca exposta no cliente.','MCP é protocolo recente — especificação pode evoluir.','Alta visibilidade executiva — risco de pressão de prazo comprometer segurança.'],premises:['Orçamento de LLM aprovado e Key Vault disponível antes do chatbot ir para produção.','Vitrine pública não exige login — mudança precisa de aprovação de produto.']},
+  {id:'A4',group:'A',name:'DX & Confiabilidade',mandate:'SDKs, Postman Hub, Status Page, Versionamento, Migração e Webhooks.',methodology:'Scrum',people:8,capabilities:['SDKs Java/Node/Python com testes (JUnit5, Jest, pytest)','Postman Hub com /diff de sincronização automática','Status Page com histórico de 90 dias','Deprecation Policy RFC 8594 — 12 meses de aviso','Migração Sandbox→Produção e replay de webhooks'],scopeLabel:'Escopo coberto hoje no protótipo',scope:['3 SDKs com testes — caminho feliz, idempotência, erro 422 nunca retenta','Status Page, Deprecation Policy e replay funcional'],profiles:'1 PM · 3 backend (um por SDK) · 1 DevOps/SRE · 1 technical writer · 1 QA · 1 tech lead',risks:['Manter 3 SDKs sincronizados é trabalho contínuo — risco de subdimensionar pós-lançamento.','Status Page real depende de APM real (Dynatrace etc).'],premises:['Pipeline CI/CD já documentado no Guia Técnico está disponível.','Política de Deprecation (12 meses) já definida — squad implementa, não decide.']},
+  {id:'A5',group:'A',name:'Plataforma API & Gateway',mandate:'Migração do gateway Axway, COE de APIs, governança de catálogo.',methodology:'Scrum',people:8,capabilities:['Benchmark e POC: Apigee (MCP-native) vs Azure APIM','COE de APIs — ~4.376 APIs, ~35 bilhões req/mês','RACI de governança e DX Score como KPI','Diagnóstico do gateway atual (Axway)'],scopeLabel:'Contexto atual',scope:['Axway limita customização, IA e MCP nativos','Apigee é MCP-native desde dez/2025 — candidato preferido','Azure APIM tem contexto CIAM já existente no banco'],profiles:'1 PM · 2 arquitetos de API · 2 backend · 1 segurança · 1 DevOps · 1 tech lead',risks:['Migração em produção com 35 bilhões req/mês — rollback detalhado obrigatório.','POC paralela consome capacidade antes de qualquer migração.'],premises:['Decisão de gateway baseada no resultado da POC, não em preferência prévia.','Mínimo 6 meses de coexistência com Axway para migração segura.']},
+  {id:'B1',group:'B',name:'Capital de Giro',mandate:'Simulação, proposta, garantias e desembolso para capital de giro empresarial.',methodology:'Scrum',people:8,capabilities:['Simulação de grade (prazo, CET, IOF em tempo real)','Fluxo completo: proposta → garantias (B5) → assinatura → desembolso','Precificação via motor B6','Webhook de desembolso com dead-letter queue'],scopeLabel:'Dependências de saída',scope:['Spec OpenAPI publicada na Squad A2','Produtos disponíveis no White Label (C1/C2)','Consome B5 e B6 — não reimplementa'],profiles:'1 PM · 3 backend · 1 arquiteto de integração · 1 QA · 1 technical writer · 1 tech lead',risks:['Integração com legados de crédito — SLA do core impacta API pública.','Maior volume do Grupo B — instabilidade do core aparece primeiro aqui.'],premises:['APIs do core bancário com SLA documentado antes do Sprint 1.']},
+  {id:'B2',group:'B',name:'Mais Prazo',mandate:'Renegociação e extensão de prazo de operações de crédito existentes.',methodology:'Scrum',people:8,capabilities:['API de elegibilidade de contratos para renegociação','Simulação de novas condições via B6','Adesão digital com assinatura eletrônica'],scopeLabel:'Características do produto',scope:['Depende de acesso a contratos existentes no core','Spread pode diferir da operação original','Integração com sistemas distintos de Capital de Giro'],profiles:'1 PM · 3 backend · 1 arquiteto · 1 QA · 1 technical writer · 1 tech lead',risks:['Depende de sistemas distintos dos usados por Capital de Giro.','Regras de elegibilidade podem mudar por política interna.'],premises:['API de contratos existentes disponível para integração antes do Sprint 1.']},
+  {id:'B3',group:'B',name:'Antecipação de Recebíveis',mandate:'Antecipação de recebíveis de cartão e duplicatas — liquidez imediata.',methodology:'Scrum',people:8,capabilities:['Consulta de recebíveis disponíveis para antecipação','Simulação de taxa e valor líquido por data de vencimento','Liquidação via PIX instantâneo ou TED','Webhook de confirmação'],scopeLabel:'Contexto regulatório',scope:['Produto mais exposto à agenda regulatória do BACEN','Requer especialista regulatório na squad','Mudanças de regra impactam o contrato da API sem aviso longo'],profiles:'1 PM · 3 backend · 1 especialista regulatório · 1 QA · 1 technical writer · 1 tech lead',risks:['Regulação BACEN mais dinâmica — mudanças sem aviso prévio longo.','Roadmap pode ser interrompido por nova regulamentação.'],premises:['Acesso à plataforma de recebíveis existente no banco antes do início.']},
+  {id:'B4',group:'B',name:'Crédito Emergencial',mandate:'Crédito de curto prazo — aprovação acelerada, poucas etapas.',methodology:'Scrum',people:8,capabilities:['Pré-aprovação em batch (noturno) e tempo real','Fluxo reduzido: garantias mínimas → desembolso acelerado','Integração com catálogo LaaS (sinais de crédito)','Precificação de risco emergencial via B6'],scopeLabel:'Diferencial do produto',scope:['Menor número de etapas de contratação do Grupo B','Score atualizado com maior frequência','Depende diretamente do catálogo LaaS'],profiles:'1 PM · 3 backend · 1 data scientist · 1 QA · 1 technical writer · 1 tech lead',risks:['Maior risco de inadimplência — score precisa ser atualizado com frequência.','Dependência do catálogo LaaS — mudanças impactam a taxa de aprovação.'],premises:['Catálogo LaaS com API estável antes do Sprint 1.']},
+  {id:'B5',group:'B',name:'Garantias',mandate:'Motor de garantias transversal — consumido por B1, B2, B3 e B4.',methodology:'Scrum',people:8,capabilities:['API de vinculação e avaliação (imóvel, veículo, equipamento, aval)','Motor de regras de elegibilidade por produto','Integração com cartório, DETRAN e avaliadores','Ciclo de vida da garantia (vinculação, liberação, substituição)'],scopeLabel:'Posição na Tribo',scope:['Squad fornecedora — B1, B2, B3 e B4 consomem sem reimplementar','Única do Grupo B que não consome B6 — lógica ortogonal à precificação'],profiles:'1 PM · 3 backend · 1 especialista jurídico/cartório · 1 QA · 1 technical writer · 1 tech lead',risks:['Breaking change impacta B1, B2, B3 e B4 simultaneamente — Deprecation Policy rígida.','Integrações com cartório e DETRAN têm SLAs externos não controláveis.'],premises:['Integrações com cartório e DETRAN mapeadas antes do Sprint 1.']},
+  {id:'B6',group:'B',name:'Pricing',mandate:'Motor de precificação transversal — taxas, spreads e CET para todos os produtos.',methodology:'Scrum',people:8,capabilities:['Cálculo de taxa em tempo real por produto, risco e canal','Gestão de políticas de spread por parceiro WL','CET e IOF antes de qualquer proposta ser criada','Histórico e auditoria para compliance'],scopeLabel:'Posição na Tribo',scope:['Squad fornecedora — consultada por B1, B2, B3 e B4 antes de qualquer simulação','SLA mais restrito do Grupo B — latência define tempo de resposta de todos os produtos'],profiles:'1 PM · 3 backend · 1 quant/atuário · 1 QA performance · 1 technical writer · 1 tech lead',risks:['Latência impacta tempo de resposta de todos os 4 produtos — SLA mais restrito do grupo.','Mudanças de spread por parceiro precisam de governança clara.'],premises:['Ambiente de performance testing disponível para validar SLA sob carga real.']},
+  {id:'C1',group:'C',name:'Plataforma White Label (MFE)',mandate:'Shell App, Webpack 5 Module Federation, Design Tokens runtime, BFF e auth multi-tenant.',methodology:'Scrum',people:8,capabilities:['Shell App com Webpack 5 Module Federation — sem conhecimento de produto em build-time','Design Tokens como CSS Custom Properties em runtime (zero-deploy white label)','MFE Registry dinâmico — adicionar produto via config, não deploy','BFF com mTLS + Service Token','Auth multi-tenant: Azure AD, Google, Okta, ADFS','Token Exchange RFC 8693 (UCT)'],scopeLabel:'Modelo estratégico — Aarin (Híbrido com Governança)',scope:['Aarin executa frontend estático (AWS/CDN)','Bradesco mantém APIs e dados no Azure (compliance BACEN)','Bradesco retém IP — Aarin não toca dados do cliente','AWS↔Azure via Direct Connect (~8ms latência)'],profiles:'1 PM · 2 frontend (MFE/shell) · 2 backend (BFF, auth) · 1 arquiteto de plataforma · 1 segurança · 1 tech lead',risks:['Breaking change no contrato CreditProductMFE paralisa C2 e 6 produtos do Grupo B.','Modelo Aarin precisa ser formalizado antes do Sprint 1.'],premises:['Acordo Aarin (Model C — Híbrido com Governança) aprovado antes do Sprint 1.','Key Vault para o Service Token do BFF antes de trafegar dados de cliente.']},
+  {id:'C2',group:'C',name:'Experiência do Parceiro',mandate:'Portal do operador, onboarding, 3 jornadas (B2B, B2C, B2B2B Embedded).',methodology:'Scrum',people:8,capabilities:['B2B Operator: wizard 5 passos, RBAC multi-nível','B2C: self-service mobile-first, Customer Registry SHA-256','B2B2B Embedded: componente para franqueadoras (Cacau Show)','Portal de onboarding com importação de Design Tokens e preview live','Admin de BaaS: MFE Registry sem deploy'],scopeLabel:'Escopo coberto hoje no protótipo',scope:['B2B Operator completo (Capital de Giro, Crédito Emergencial, Antecipação)','B2C mobile-first com proposta e assinatura','B2B2B Embedded: Cacau Show com widget embarcado','Demo Design Token runtime: Cacau Show ↔ O Boticário sem rebuild'],profiles:'1 PM · 3 frontend (um por jornada) · 1 designer · 1 backend (BFF por jornada) · 1 QA · 1 tech lead',risks:['3 jornadas com UX distintas na mesma plataforma — risco de acoplamento com C1.','Tokens malformados de parceiros podem afetar outras jornadas.'],premises:['Contrato CreditProductMFE definido por C1 e consumido por C2 — nunca o contrário.','Cada produto B que quiser WL implementa a interface — não é responsabilidade de C2.']},
+  {id:'R1',group:'R',name:'Run — Operação & Sucesso do Cliente Integrado',mandate:'Garante o pleno funcionamento de todo cliente já integrado, em qualquer produto.',methodology:'Kanban',people:8,capabilities:['Monitoramento transversal de A, B e C em produção','Triagem de incidentes e escalação para squads de Build','Suporte N1/N2 a parceiros integrados','Gestão de rate limit, dead-letter queue, replay de webhooks','Acompanhamento de SLA e relacionamento pós-integração'],scopeLabel:'Por que Kanban, não Scrum',scope:['Incidente não espera sprint — trabalho imprevisível','Métrica é lead time de resolução, não velocity','Fluxo 24/7 sem "fim de sprint"'],profiles:'1 PM / Service Owner · 3 SRE (plantão) · 2 especialistas de produto · 1 analista de observabilidade · 1 tech lead',risks:['Cobrir 13 produtos com 8 pessoas exige rodízio de conhecimento bem documentado.','Interface Run ↔ Build precisa de protocolo claro e runbooks antes do go-live.'],premises:['Observabilidade real (Dynatrace ou equivalente) disponível em produção.','Cada squad de Build documenta runbook antes do go-live — Run não abre código-fonte para diagnosticar.']}
+];
+
+// ═══ FIREBASE CONFIG ════════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey:      'AIzaSyAa3uxYyktTJC7o_CIx0RBFObWcxCPjzso',
+  projectId:   'realtime-database-61af7',
+  databaseURL: 'https://realtime-database-61af7-default-rtdb.firebaseio.com'
+};
+function isFBReady(){ return true; }
+
+const DEFAULT_DEPCATALOG=[
+  {id:'d1',name:'Azure AD / Entra ID',category:'Identidade',type:'interno'},
+  {id:'d2',name:'Core Bancário (legado)',category:'Sistemas Legados',type:'interno'},
+  {id:'d3',name:'BACEN / Open Finance',category:'Regulatório',type:'externo'},
+  {id:'d4',name:'Axway (gateway atual)',category:'Infraestrutura',type:'interno'},
+  {id:'d5',name:'Aarin',category:'Parceiro Estratégico',type:'externo'},
+  {id:'d6',name:'DETRAN (multi-UF)',category:'Governo',type:'externo'},
+  {id:'d7',name:'Cartório / Avaliadores',category:'Parceiro',type:'externo'},
+  {id:'d8',name:'SPI (Sistema de Pagamentos)',category:'BACEN',type:'externo'},
+  {id:'d9',name:'OpenAPI Generator',category:'Ferramentas Dev',type:'externo'},
+  {id:'d10',name:'Dynatrace / APM',category:'Observabilidade',type:'interno'},
+];
+const DEFAULT_TOOLS=[
+  {id:'t1',layer:'Gateway',tool:'Apigee (MCP-native) ou Azure APIM — POC paralela',squad:'A5',purpose:'Substitui Axway; MCP-native desde dez/2025'},
+  {id:'t2',layer:'AI Gateway',tool:'Camada própria (AWS/Azure) em frente aos LLMs',squad:'A3',purpose:'Chave nunca exposta no cliente'},
+  {id:'t3',layer:'MCP Server',tool:'Anthropic MCP SDK + isolamento de rede',squad:'A3',purpose:'Claude, GPT, Gemini via protocolo padronizado'},
+  {id:'t4',layer:'Identidade',tool:'Azure AD / Microsoft Entra ID',squad:'A1',purpose:'OAuth2 + OIDC + MFA corporativo'},
+  {id:'t5',layer:'MFE Shell',tool:'Webpack 5 Module Federation',squad:'C1',purpose:'Shell sem conhecimento de produto em build-time'},
+  {id:'t6',layer:'White Label',tool:'CSS Custom Properties em runtime (Design Tokens)',squad:'C1',purpose:'Troca de marca zero-deploy'},
+  {id:'t7',layer:'Cloud',tool:'AWS (Aarin/CDN) + Azure (Bradesco APIs/dados)',squad:'C1',purpose:'Híbrido regulatório'},
+  {id:'t8',layer:'APIs de Crédito',tool:'OpenAPI 3.1 + openapi-generator',squad:'B1–B6',purpose:'Fonte única — gera SDK, Postman, docs'},
+  {id:'t9',layer:'Observabilidade',tool:'Dynatrace ou equivalente APM',squad:'R1',purpose:'Status Page e SLA reais'},
+  {id:'t10',layer:'Segredos',tool:'Azure Key Vault',squad:'A1/A3',purpose:'Cofre obrigatório antes de qualquer chave real'},
+];
+const DEFAULT_RISKS=[
+  {id:'r1',title:'Specs OpenAPI desatualizadas',description:'Toda a cadeia depende de specs congeladas do Grupo B. Sem gate de spec congelada, doc e SDK divergem da API silenciosamente.',probability:'alta',impact:'alto',category:'Técnico',mitigations:['Gate de spec congelada antes de cada squad iniciar','Review mensal entre spec e implementação'],deadline:'2026-09-01',owner:'A2',status:'aberto'},
+  {id:'r2',title:'Chave de LLM exposta no cliente',description:'Se o chatbot (A3) ou qualquer integração IA (C1) avançar sem o AI Gateway backend, há risco real de vazamento de credencial de alto custo.',probability:'media',impact:'alto',category:'Segurança',mitigations:['AI Gateway obrigatório antes de qualquer LLM em produção','Azure Key Vault para todas as chaves de API'],deadline:'2026-08-01',owner:'A3',status:'aberto'},
+  {id:'r3',title:'Breaking change no contrato MFE',description:'O contrato CreditProductMFE é consumido por C2 e pelos 6 produtos do Grupo B. Breaking change sem 90 dias de aviso paralisa múltiplas squads.',probability:'media',impact:'alto',category:'Arquitetura',mitigations:['Versionamento semântico obrigatório','90 dias de aviso para breaking changes','Testes de contrato no CI'],deadline:'2026-10-01',owner:'C1',status:'aberto'},
+  {id:'r4',title:'Interface Build × Run sem protocolo',description:'Com 13 produtos em produção, a Squad Run sem runbooks e protocolo de escalação terá incidentes sem dono.',probability:'alta',impact:'medio',category:'Operacional',mitigations:['Runbook obrigatório antes do go-live de cada produto','Protocolo de escalação formalizado','GameDay trimestral'],deadline:'2026-09-15',owner:'R1',status:'aberto'},
+];
+const DEFAULT_STRATEGIC=[
+  {id:'s1',eyebrow:'⚡ Independência de plataforma',title:'Axway hoje limita o ritmo de inovação. Esta proposta elimina essa dependência.',description:'MCP Server, gRPC multi-estado, White Label com MFE federation, chatbot IA — nada disso é possível dentro do roadmap do vendor atual. A tribo opera sobre arquitetura própria, sem licenciamento por volume.',before:{label:'Hoje — com Axway',items:['Roadmap depende do vendor','Customização limitada','Licenciamento por volume','IA, MCP e gRPC fora do escopo','White Label impossível nativamente']},after:{label:'Com esta proposta',items:['Roadmap controlado pela tribo','Arquitetura própria, sem limite','Custo de infra previsível','MCP, gRPC e IA nativos','White Label zero-deploy via Design Tokens']}},
+];
+const DEFAULT_EXTERNALDEPS=[
+  {id:'ext1',name:'BACEN / Open Finance',category:'Regulatório',impact:'alto',description:'Mudanças regulatórias impactam Antecipação de Recebíveis e PIX. Monitorar publicações do BACEN.',squads:['B3','B2']},
+  {id:'ext2',name:'SPI (Sistema de Pagamentos)',category:'Infraestrutura BACEN',impact:'alto',description:'Disponibilidade do SPI define o SLA real do PIX — limite externo não controlável.',squads:['B2']},
+  {id:'ext3',name:'Aarin',category:'Parceiro Estratégico',impact:'alto',description:'Opera o CDN/frontend estático (Modelo Híbrido). Acordo operacional é pré-requisito do Grupo C.',squads:['C1','C2']},
+  {id:'ext4',name:'DETRAN (multi-UF)',category:'Governo',impact:'medio',description:'SLAs externos impactam vinculação de garantia e consulta de débitos veiculares.',squads:['A2','B5']},
+  {id:'ext5',name:'Cartório e Avaliadores',category:'Parceiro',impact:'medio',description:'Integrações de cartório têm SLAs externos. Impacto direto na Squad B5.',squads:['B5']},
+  {id:'ext6',name:'Microsoft Azure AD',category:'Identidade',impact:'alto',description:'Identity corporativo do banco. Mudanças impactam login do portal e do White Label.',squads:['A1','C1']},
+];
+
+// ═══ STATE ═══
+let db=null,squads=[],groups={},members=[],editMode=false,editingSquadId=null,editingMemberId=null,
+    pendingDeleteId=null,pendingDeleteType=null,selectedGroupColor={color:'#CC092F',faint:'#FBE9EC'},
+    editingGroupId=null,depCatalog=[],tools=[],risks=[],strategicCards=[],externalDeps=[],
+    editingRiskId=null,editingToolId=null,editingStrategicId=null,editingExtDepId=null,editingDepId=null,
+    currentUser='',fbToken=null,sseConn=null,lastSyncAt=null;
+
+// ═══ INDEXDB (cache local / fallback) ═══
+async function initDB(){
+  return new Promise((res,rej)=>{
+    const req=indexedDB.open('BaaSTriboV3',2);
+    req.onupgradeneeded=e=>{
+      const db=e.target.result;
+      if(!db.objectStoreNames.contains('data')) db.createObjectStore('data',{keyPath:'_k'});
+    };
+    req.onsuccess=e=>{db=e.target.result;res()};
+    req.onerror=()=>rej(req.error);
+  });
+}
+async function dbGet(key){
+  return new Promise((res)=>{
+    try{const tx=db.transaction('data','readonly'),r=tx.objectStore('data').get(key);r.onsuccess=()=>res(r.result?JSON.parse(r.result.v):null);r.onerror=()=>res(null);}catch{res(null);}
+  });
+}
+async function dbSet(key,val){
+  return new Promise((res)=>{
+    try{const tx=db.transaction('data','readwrite');tx.objectStore('data').put({_k:key,v:JSON.stringify(val)});tx.oncomplete=res;tx.onerror=res;}catch{res();}
+  });
+}
+
+// ═══ FIREBASE REST API ════════════════════════════════════════════════
+async function fbSignInAnonymous(){
+  // Authenticate anonymously — apenas para obter um token válido para as regras do banco
+  const r=await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_CONFIG.apiKey}`,
+    {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+  fbToken=d.idToken;
+  return fbToken;
+}
+function fbUrl(path){return `${FIREBASE_CONFIG.databaseURL}/${path}.json?auth=${fbToken}`;}
+async function fbGet(path){
+  const r=await fetch(fbUrl(path));const d=await r.json();
+  if(d&&d.error) throw new Error(d.error);return d;
+}
+async function fbSet(path,data){
+  const r=await fetch(fbUrl(path),{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  const d=await r.json();if(d&&d.error) throw new Error(d.error);return d;
+}
+
+// ═══ SSE — REAL-TIME LISTENER ════════════════════════════════════════
+function startSSE(){
+  if(sseConn){sseConn.close();sseConn=null;}
+  if(!isFBReady()||!fbToken) return;
+  try{
+    sseConn=new EventSource(fbUrl('state'));
+    sseConn.addEventListener('put',e=>{
+      try{
+        const msg=JSON.parse(e.data);
+        if(!msg.data||!msg.data.squads) return;
+        const state=msg.data;
+        // Ignora updates que vieram de nós mesmos (evita loop)
+        if(state.lastBy===currentUser&&Date.now()-new Date(state.lastAt).getTime()<3000) return;
+        squads=state.squads?normArr(state.squads,DEFAULT_SQUADS):squads;
+        groups=state.groups||groups;
+        members=state.members?normArr(state.members,DEFAULT_MEMBERS):members;
+        if(state.depCatalog) depCatalog=normArr(state.depCatalog,DEFAULT_DEPCATALOG);
+        if(state.tools) tools=normArr(state.tools,DEFAULT_TOOLS);
+        if(state.risks) risks=normArr(state.risks,DEFAULT_RISKS);
+        if(state.strategicCards) strategicCards=normArr(state.strategicCards,DEFAULT_STRATEGIC);
+        if(state.externalDeps) externalDeps=normArr(state.externalDeps,DEFAULT_EXTERNALDEPS);
+        lastSyncAt=new Date();
+        renderAll();updateSyncBadge();
+        if(state.lastBy&&state.lastBy!==currentUser)
+          showToast('📡 Atualizado por '+state.lastBy.split('@')[0]);
+      }catch(err){}
+    });
+    sseConn.onerror=()=>{
+      sseConn.close();sseConn=null;
+      // Reconecta em 8s
+      setTimeout(startSSE,8000);
+    };
+  }catch(err){console.warn('SSE error:',err);}
+}
+
+// ═══ SYNC STATUS ═════════════════════════════════════════════════════
+function updateSyncBadge(){
+  const badge=document.getElementById('sync-badge');
+  if(!badge) return;
+  if(!isFBReady()){badge.textContent='⚪ Local';badge.style.color='var(--g400)';return;}
+  if(!fbToken){badge.textContent='🔴 Sem conexão';badge.style.color='#EF4444';return;}
+  const t=lastSyncAt?lastSyncAt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}):'';
+  badge.textContent='🟢 Sync '+(t?t:'');
+  badge.style.color='#22C55E';
+}
+
+
+function normArr(v,def){ if(!v) return def.map(x=>({...x})); return Array.isArray(v)?v:Object.values(v).filter(Boolean); }
+async function persist(){
+  const state={squads,groups,members,depCatalog,tools,risks,strategicCards,externalDeps:[],lastBy:currentUser,lastAt:new Date().toISOString()};
+  if(isFBReady()&&fbToken){
+    try{
+      await fbSet('state',state);
+      // Cache local também
+      await dbSet('state',state);
+      lastSyncAt=new Date();updateSyncBadge();
+      showToast('Salvo e sincronizado ✓');
+    }catch(e){
+      // Firebase falhou → salva local
+      await dbSet('state',state);
+      showToast('⚠️ Firebase offline — salvo localmente');
+    }
+  }else{
+    await dbSet('state',state);
+    showToast('Salvo localmente ✓');
+  }
+}
+
+// ═══ LOGIN ═══
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const err=document.getElementById('login-error');
+  const btn=document.querySelector('.login-btn');
+  if(!email){err.textContent='Informe seu e-mail corporativo.';return;}
+  if(!email.endsWith('@bradesco.com.br')&&!email.endsWith('@bradesco.com')){
+    err.textContent='Apenas e-mails @bradesco.com.br são permitidos.';return;
+  }
+  btn.textContent='Entrando...';btn.disabled=true;
+  currentUser=email;
+  try{
+    if(isFBReady()){
+      await fbSignInAnonymous();
+      // Carrega dados do Firebase
+      const state=await fbGet('state').catch(()=>null);
+      if(state&&state.squads){
+        // Firebase converte arrays em objetos {0:{},1:{}...} — reconverte para array
+        squads=normArr(state.squads,DEFAULT_SQUADS);
+        groups=state.groups||Object.assign({},DEFAULT_GROUPS);
+        members=normArr(state.members,DEFAULT_MEMBERS);
+        depCatalog=normArr(state.depCatalog,DEFAULT_DEPCATALOG);
+        tools=normArr(state.tools,DEFAULT_TOOLS);
+        risks=normArr(state.risks,DEFAULT_RISKS);
+        strategicCards=normArr(state.strategicCards,DEFAULT_STRATEGIC);
+        externalDeps=normArr(state.externalDeps,DEFAULT_EXTERNALDEPS);
+      }
+    } else {
+      // Fallback: carrega do IndexedDB local
+      const state=await dbGet('state').catch(()=>null);
+      if(state&&state.squads){
+        squads=normArr(state.squads,DEFAULT_SQUADS);
+        groups=state.groups||Object.assign({},DEFAULT_GROUPS);
+        members=normArr(state.members,DEFAULT_MEMBERS);
+        depCatalog=normArr(state.depCatalog,DEFAULT_DEPCATALOG);
+        tools=normArr(state.tools,DEFAULT_TOOLS);
+        risks=normArr(state.risks,DEFAULT_RISKS);
+        strategicCards=normArr(state.strategicCards,DEFAULT_STRATEGIC);
+        externalDeps=normArr(state.externalDeps,DEFAULT_EXTERNALDEPS);
+      }
+    }
+  }catch(e){
+    console.warn('Load error:',e);
+  }
+  btn.textContent='Entrar →';btn.disabled=false;
+  sessionStorage.setItem('baas_user',email);
+  document.getElementById('login-overlay').style.display='none';
+  document.getElementById('main-nav').style.display='';
+  document.getElementById('main-content').style.display='';
+  document.getElementById('nav-user-email').textContent=email;
+  document.getElementById('footer-user').textContent=email;
+  lastSyncAt=new Date();
+  renderAll();updateSyncBadge();
+  if(isFBReady()) startSSE();
+}
+function doLogout(){
+  sessionStorage.removeItem('baas_user');
+  document.getElementById('login-overlay').style.display='';
+  document.getElementById('main-nav').style.display='none';
+  document.getElementById('main-content').style.display='none';
+  if(editMode){editMode=false;document.body.classList.remove('editing');}
+}
+const _lEmail=document.getElementById('login-email'),_lPass=document.getElementById('login-pass');
+if(_lEmail) _lEmail.addEventListener('keydown',e=>{if(e.key==='Enter')_lPass&&_lPass.focus();});
+if(_lPass) _lPass.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+
+// ═══ RENDER ═══
+const GROUP_ORDER=['A','B','C','R'];
+const SEC_IDS={A:'devportal',B:'credito',C:'whitelabel',R:'run'};
+
+function accentStyle(g){const m=groups[g]||DEFAULT_GROUPS[g];return m?`--accent:${m.color};--accent-f:${m.faint}`:'';}
+
+function renderCard(sq){
+  const m=groups[sq.group]||DEFAULT_GROUPS[sq.group]||{color:'#6B6F80',faint:'#EFEDE8'};
+  const _alloc=(members||[]).filter(mb=>mb.squadId===sq.id).length;
+  const _mbadge=_alloc>0?'<span class="member-count-badge '+(_alloc>=sq.people?'full':'gap')+'">'+ _alloc+'/'+sq.people+' alocados</span>':'';
+  const isRun=sq.group==='R';
+  const caps=(sq.capabilities||[]).map(c=>`<li>${c}</li>`).join('');
+  const scope=(sq.scope||[]).map(s=>`<li>${s}</li>`).join('');
+  const risks=(sq.risks||[]).map(r=>`<div class="risk-item">${r}</div>`).join('');
+  const prems=(sq.premises||[]).map(p=>`<div class="premise-item">${p}</div>`).join('');
+  const actions=`<div class="squad-actions"><button class="btn-edit" onclick="event.stopPropagation();openSquadEdit('${sq.id}')">✏️</button><button class="btn-del" onclick="event.stopPropagation();askDeleteSquad('${sq.id}')">✕</button></div>`;
+  const detail=`<div class="squad-detail"><div class="squad-detail-inner">
+    <div class="sd-block"><div class="sd-label">Capabilities</div><ul class="sd-list">${caps}</ul></div>
+    <div class="sd-block"><div class="sd-label">${sq.scopeLabel||'Escopo'}</div><ul class="sd-list">${scope}</ul></div>
+    <div class="sd-block"><div class="sd-label">Perfis (${sq.people})</div><ul class="sd-list"><li>${sq.profiles}</li></ul></div>
+    <div class="sd-block"><div class="sd-label">Riscos</div>${risks}</div>
+    <div class="sd-block"><div class="sd-label">Premissas</div>${prems}</div>
+  </div></div>`;
+  if(isRun) return `<div class="run-card" data-id="${sq.id}">
+    <div class="run-inner">
+      <div class="run-left">
+        <div style="font-family:var(--mono);font-size:11px;font-weight:700;color:${m.color};margin-bottom:7px">${sq.id} · RUN</div>
+        <div style="font-family:var(--serif);font-weight:700;font-size:16px;color:var(--ink);margin-bottom:6px">${sq.name}</div>
+        <div style="font-size:11.5px;color:var(--g500)">${sq.people} pessoas · 1 PM · <span style="font-family:var(--mono);font-weight:700;color:${m.color}">${sq.methodology}</span></div>
+        <div class="squad-actions" style="margin-top:10px"><button class="btn-edit" onclick="openSquadEdit('${sq.id}')">✏️ Editar</button><button class="btn-del" onclick="askDeleteSquad('${sq.id}')">✕ Excluir</button></div>
+      </div>
+      <div class="run-right"><div style="font-size:13px;color:var(--g700);line-height:1.6;margin-bottom:6px">${sq.mandate}</div><div style="font-size:11.5px;color:var(--g500)">Não constrói feature nova — é o "Run it" do Build it and Run it. Fluxo contínuo 24/7.</div></div>
+    </div>
+    <div class="run-toggle" onclick="toggleCard(this)">Ver capabilities, riscos e premissas <span>▾</span></div>
+    ${detail}
+  </div>`;
+  return `<div class="squad-card" style="${accentStyle(sq.group)}" data-id="${sq.id}">
+    <div class="squad-top">
+      <div class="squad-num">${sq.id}</div>
+      <div class="squad-name">${sq.name}</div>
+      <div class="squad-mandate">${sq.mandate}</div>
+      <div class="squad-meta">
+        <span class="squad-meta-item"><b>${sq.people}</b> pessoas</span>
+        <span class="squad-meta-item"><b>1</b> PM</span>
+        <span class="squad-method">${sq.methodology}</span>
+        ${_mbadge}
+        ${actions}
+      </div>
+    </div>
+    <div class="squad-toggle" onclick="toggleCard(this)">Ver detalhes completos <span>▾</span></div>
+    ${detail}
+  </div>`;
+}
+
+function renderFlow(){
+  // Auto-compute positions for all squads
+  const allNodes={};
+  const groupSquadMap={};
+  squads.forEach(sq=>{if(!groupSquadMap[sq.group])groupSquadMap[sq.group]=[];groupSquadMap[sq.group].push(sq);});
+  const NW=128,NH=44;
+  // Static known positions
+  const staticPos={A1:{x:14,y:22},A2:{x:14,y:100},A3:{x:14,y:178},A4:{x:14,y:256},A5:{x:14,y:334},B5:{x:250,y:22},B6:{x:400,y:22},B1:{x:190,y:138},B2:{x:335,y:138},B3:{x:480,y:138},B4:{x:625,y:138},C1:{x:800,y:60},C2:{x:800,y:160},R1:{x:240,y:400}};
+  squads.forEach(sq=>{
+    if(staticPos[sq.id]){allNodes[sq.id]=staticPos[sq.id];return;}
+    const g=sq.group,gs=groupSquadMap[g]||[],idx=gs.findIndex(s=>s.id===sq.id);
+    const customGroups=Object.keys(groups).filter(k=>!['A','B','C','R'].includes(k));
+    const cgIdx=customGroups.indexOf(g);
+    if(g==='A'){
+      const aLen=groupSquadMap['A']?groupSquadMap['A'].length:5;
+      if(aLen<=7){allNodes[sq.id]={x:14,y:22+idx*78};}
+      else{// Two columns for large A groups
+        allNodes[sq.id]={x:14+(Math.floor(idx/5)*150),y:22+(idx%5)*78};}
+    }
+    else if(g==='B'){allNodes[sq.id]=idx<2?{x:250+idx*150,y:22}:{x:190+(idx-2)*145,y:138};}
+    else if(g==='C'){allNodes[sq.id]={x:800,y:60+idx*100};}
+    else if(g==='R'){
+      const rcols=Math.min(3,groupSquadMap['R']?groupSquadMap['R'].length:1);
+      allNodes[sq.id]={x:240+(idx%rcols)*200,y:400+Math.floor(idx/rcols)*64};
+    }
+    else{
+      // Grid layout for custom groups: max 5 per row, wraps vertically
+      const COLS=Math.min(5,groupSquadMap[g]?groupSquadMap[g].length:5);
+      const col=idx%COLS;
+      const row=Math.floor(idx/COLS);
+      const rows=Math.ceil((groupSquadMap[g]?groupSquadMap[g].length:1)/COLS);
+      // Each previous custom group takes rows*78+40 height
+      let prevGroupsH=0;
+      const cgKeys=Object.keys(groups).filter(k=>!['A','B','C','R'].includes(k));
+      for(let ci=0;ci<cgIdx;ci++){
+        const cg=cgKeys[ci];
+        const cgLen=groupSquadMap[cg]?groupSquadMap[cg].length:0;
+        const cgRows=Math.ceil(cgLen/COLS);
+        prevGroupsH+=cgRows*78+40;
+      }
+      allNodes[sq.id]={x:14+col*145,y:500+prevGroupsH+row*78};
+    }
+  });
+  const isR1=(id)=>id==='R1';
+  const W=(id)=>isR1(id)?500:NW,H=(id)=>isR1(id)?54:NH;
+  const cx=(id)=>{const n=allNodes[id];return n?n.x+W(id)/2:0;};
+  const cy=(id)=>{const n=allNodes[id];return n?n.y+H(id)/2:0;};
+
+  // Connections
+  const conns=[
+    {f:'B5',t:'B1',color:'#4F46E5',label:'garantias',w:1.8},
+    {f:'B5',t:'B2',color:'#4F46E5',label:'garantias',w:1.8},
+    {f:'B6',t:'B3',color:'#4F46E5',label:'pricing',w:1.8},
+    {f:'B6',t:'B4',color:'#4F46E5',label:'pricing',w:1.8},
+    {f:'B1',t:'A2',color:'#CC092F',label:'specs',w:1.6},
+    {f:'B3',t:'C1',color:'#1A8754',label:'produtos WL',w:1.6},
+    {f:'A1',t:'C1',color:'#7C3AED',label:'auth',w:1.6},
+    {f:'C1',t:'C2',color:'#1A8754',label:'MFE',w:1.8},
+    {f:'A5',t:'R1',color:'#0EA5E9',label:'',w:1},
+    {f:'B2',t:'R1',color:'#0EA5E9',label:'',w:1},
+    {f:'C2',t:'R1',color:'#0EA5E9',label:'',w:1},
+  ];
+
+  // Add connections for new custom-group squads to R1
+  squads.forEach(sq=>{
+    if(!['A','B','C','R'].includes(sq.group)){
+      conns.push({f:sq.id,t:'R1',color:'#0EA5E9',label:'',w:1});
+    }
+  });
+
+  let maxY=480,maxX=990;
+  Object.values(allNodes).forEach(n=>{
+    maxY=Math.max(maxY,n.y+80);
+    maxX=Math.max(maxX,n.x+NW+20);
+  });
+  const VH=maxY,VW=Math.max(990,maxX);
+
+  let defs='<defs>';
+  conns.forEach((c,i)=>{defs+=`<marker id="a${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L8,4 L0,8 z" fill="${c.color}"/></marker>`;});
+  defs+='</defs>';
+
+  let arrows='';
+  conns.forEach((c,i)=>{
+    if(!allNodes[c.f]||!allNodes[c.t]) return;
+    const x1=cx(c.f),y1=cy(c.f),x2=cx(c.t),y2=cy(c.t),mx=(x1+x2)/2,my=Math.min(y1,y2)-30;
+    arrows+=`<path class="flow-arrow" data-f="${c.f}" data-t="${c.t}" d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" fill="none" stroke="${c.color}" stroke-width="${c.w}" marker-end="url(#a${i})" opacity="${c.label?.6:.25}"/>`;
+    if(c.label){arrows+=`<text x="${mx}" y="${my-3}" text-anchor="middle" font-size="8" fill="${c.color}" font-family="var(--mono)" font-weight="600">${c.label}</text>`;}
+  });
+
+  const gColors={'A':'#CC092F','B':'#4F46E5','C':'#1A8754','R':'#0EA5E9'};
+  const gFaint={'A':'#FBE9EC','B':'#EEEDFC','C':'#E8F5EE','R':'#E0F2FE'};
+  let nodes='';
+  squads.forEach(sq=>{
+    const n=allNodes[sq.id];if(!n) return;
+    const w=W(sq.id),h=H(sq.id);
+    const m=groups[sq.group]||DEFAULT_GROUPS[sq.group]||{};
+    const gc=m.color||gColors[sq.group]||'#6B6F80';
+    const gf=m.faint||gFaint[sq.group]||'#F0F0F0';
+    const label=sq.id+(sq.name.length>18?' · '+sq.name.substring(0,17)+'…':' · '+sq.name);
+    nodes+=`<g class="flow-node" data-id="${sq.id}" onclick="flowClick('${sq.id}')">
+      <rect x="${n.x}" y="${n.y}" width="${w}" height="${h}" rx="8" fill="${gf}" stroke="${gc}" stroke-width="1.5"/>
+      <text x="${n.x+w/2}" y="${n.y+h/2-6}" text-anchor="middle" font-family="var(--mono)" font-size="9.5" font-weight="700" fill="#14161F">${sq.id}</text>
+      <text x="${n.x+w/2}" y="${n.y+h/2+8}" text-anchor="middle" font-family="var(--sans)" font-size="9" fill="#6B6F80">${sq.name.substring(0,sq.id==='R1'?42:20)}</text>
+    </g>`;
+  });
+
+  const bgA=`<rect x="6" y="6" width="146" height="${Math.max(390,((groupSquadMap['A']||[]).length)*78+40)}" rx="10" fill="#FBE9EC" opacity=".3"/>`;
+  const bgB=`<rect x="178" y="6" width="582" height="205" rx="10" fill="#EEEDFC" opacity=".3"/>`;
+  const bgC=`<rect x="792" y="44" width="172" height="${Math.max(170,((groupSquadMap['C']||[]).length)*100+20)}" rx="10" fill="#E8F5EE" opacity=".3"/>`;
+
+  return `<svg viewBox="0 0 ${VW} ${VH}" style="width:100%;height:auto" id="flow-svg">${defs}${bgA}${bgB}${bgC}${arrows}${nodes}</svg>`;
+}
+
+function renderMembers(){
+  const roleColors={TTL:'#A78BFA',TPL:'#34D399',AC:'#60A5FA',DIR:'#F87171',SUPESR:'#FBBF24',SUPE:'#FB923C',TL:'#22D3EE',PM:'#4ADE80',ENG:'#94A3B8',OUTRO:'#CBD5E1'};
+  const roleFaint={TTL:'rgba(167,139,250,.15)',TPL:'rgba(52,211,153,.15)',AC:'rgba(96,165,250,.15)',DIR:'rgba(248,113,113,.15)',SUPESR:'rgba(251,191,36,.15)',SUPE:'rgba(251,146,60,.15)',TL:'rgba(34,211,238,.15)',PM:'rgba(74,222,128,.15)',ENG:'rgba(148,163,184,.15)',OUTRO:'rgba(203,213,225,.15)'};
+  const cards=members.map(m=>{
+    const sq=squads.find(s=>s.id===m.squadId);
+    const sqTag=sq?`<div class="member-squad-tag" style="background:rgba(255,255,255,.1);color:rgba(255,255,255,.7)">${sq.id} · ${sq.name.substring(0,20)}</div>`:'';
+    const sqDetail=sq?`<b>Squad:</b> ${sq.id} — ${sq.name}<br><span style="color:rgba(255,255,255,.5)">${sq.mandate||''}</span>`:`<span style="color:rgba(255,255,255,.4)">Sem squad específica</span>`;
+    const editBtns=`<div class="member-edit-btns"><button class="btn-mem-edit" onclick="event.stopPropagation();openMemberEdit('${m.id}')">✏️</button><button class="btn-mem-del" onclick="event.stopPropagation();askDeleteMember('${m.id}')">✕</button></div>`;
+    const mGroup=squads.find(s=>s.id===m.squadId)?.group||'';
+    const mColor=(groups[mGroup]||DEFAULT_GROUPS[mGroup]||{}).color||'rgba(255,255,255,.2)';
+    return `<div class="member-card" id="mc-${m.id}" onclick="toggleMember('${m.id}')" style="border-top:3px solid ${mColor}">
+      ${editBtns}
+      <div class="member-role-badge" style="background:${roleFaint[m.role]||roleFaint.OUTRO};color:${roleColors[m.role]||roleColors.OUTRO}">${m.role}</div>
+      <div class="member-name">${m.name||'(a definir)'}</div>
+      <div class="member-title">${m.title||''}</div>
+      ${m.area?`<div style="font-size:10.5px;color:rgba(255,255,255,.35);margin-top:4px">${m.area}</div>`:''}
+      ${sqTag}
+      <div class="member-detail">${sqDetail}</div>
+    </div>`;
+  }).join('');
+  const addBtn=`<div class="team-header-actions"><button class="btn-nav" style="background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.2)" onclick="openMemberAdd()">＋ Adicionar membro</button></div>`;
+  return `<div class="section" id="team" style="scroll-margin-top:72px">
+    <div class="section-head"><div class="section-head-left"><div class="seyebrow">Composição da Tribo</div><h2>Team Members</h2></div></div>
+    <div class="team-section">
+      <div class="team-eyebrow">👥 COMPOSIÇÃO DA TRIBO</div>
+      <div class="team-title">As pessoas que fazem a Tribo acontecer</div>
+      <div class="team-sub">Liderança técnica, de produto e operacional da Tribo Bradesco as a Service. Clique em qualquer membro para ver a squad à qual pertence.</div>
+      ${addBtn}
+      <div class="team-grid">${cards||'<div style="color:rgba(255,255,255,.4);font-size:13px">Nenhum membro cadastrado. Ative o modo edição e clique em "＋ Adicionar membro".</div>'}</div>
+    </div>
+  </div>`;
+}
+
+
+// ═══ MIGRAÇÃO: externalDeps → depCatalog ═════════════════════════════════
+// Roda uma vez após o carregamento para consolidar dados antigos do Firebase
+function migrateExternalDepsToCalog(){
+  if(!externalDeps||!externalDeps.length) return false;
+  const existingIds=new Set((depCatalog||[]).map(d=>d.id));
+  let migrated=0;
+  externalDeps.forEach(ext=>{
+    if(!existingIds.has(ext.id)&&ext.name){
+      depCatalog.push({
+        id:ext.id||('migrated_'+Date.now()+'_'+migrated),
+        name:ext.name,
+        category:ext.category||'Externo',
+        type:'externo',
+        impact:ext.impact||'medio'
+      });
+      migrated++;
+    }
+  });
+  if(migrated>0||externalDeps.length>0){
+    externalDeps=[];
+    return true; // needs persist
+  }
+  return false;
+}
+
+function renderAll(){
+  const root=document.getElementById('sections-root');
+  if(!root) return;
+  // GARANTIA: squads e members são sempre arrays — Firebase pode retornar objetos
+  if(!Array.isArray(squads)) squads=Object.values(squads||{}).filter(s=>s&&s.id);
+  if(!Array.isArray(members)) members=Object.values(members||{}).filter(m=>m&&m.id);
+  if(!groups||typeof groups!=='object'||Array.isArray(groups)) groups=Object.assign({},DEFAULT_GROUPS);
+  // Garante que cada squad tem os arrays obrigatórios
+  const nA=v=>Array.isArray(v)?v:Object.values(v||{}).filter(x=>typeof x==='string');
+  squads=squads.map(s=>({...s,capabilities:nA(s.capabilities),scope:nA(s.scope),risks:nA(s.risks),premises:nA(s.premises),dependencies:Array.isArray(s.dependencies)?s.dependencies:Object.values(s.dependencies||{})}));
+  let html='';
+  try{
+  const orderedGroups=[...GROUP_ORDER,...Object.keys(groups||{}).filter(g=>!GROUP_ORDER.includes(g))];
+  orderedGroups.forEach(g=>{
+    const m=groups[g];if(!m) return;
+    const gs=squads.filter(s=>s.group===g);if(!gs.length&&g!=='A'&&g!=='B'&&g!=='C'&&g!=='R') return;
+    const isRun=g==='R';
+    const grid=g==='C'?'squad-grid-2':'squad-grid';
+    const cards=gs.map(sq=>renderCard(sq)).join('');
+    const count=`${gs.length} squad${gs.length!==1?'s':''} · ${isRun?'Kanban':'Scrum'}`;
+    const badgeStyle=`background:${m.faint};color:${m.color};border-color:${m.color}`;
+    const addBtn=`<button class="add-squad-btn" onclick="openSquadAdd('${g}')">＋ Squad</button>`;
+    const secId=SEC_IDS[g]||('sec-'+g.toLowerCase());
+    html+=`<div class="section" id="${secId}" style="scroll-margin-top:72px">
+      <div class="section-head">
+        <div class="section-head-left">
+          <div class="seyebrow" style="color:${m.color}">Grupo ${g} · ${m.name}</div>
+          <h2>${isRun?'Squad de Run — Operação':m.name}</h2>
+          <p>${m.desc||''}</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="group-badge" style="${badgeStyle}">${count}</div>
+          ${addBtn}
+          <button class="add-squad-btn" onclick="openGroupEdit('${g}')" style="border-style:solid;color:${m.color};border-color:${m.color}">✏️ Editar grupo</button>
+        </div>
+      </div>
+      ${isRun?cards:`<div class="${grid}">${cards}</div>`}
+    </div>`;
+  });
+
+  }catch(e){console.error('Squad sections:',e);}
+  try{
+  // Flow
+  html+=renderFlowSection();
+
+  }catch(e){console.error('Flow:',e);}
+  try{
+  // Team Members
+  html+=renderMembers();
+
+  }catch(e){console.error('Members:',e);}
+  try{
+  html+=renderStrategic();
+  html+=renderTools();
+  html+=renderRisks();
+  }catch(e){console.error('Dynamic sections:',e);}
+  root.innerHTML=html||'<div style="padding:40px 28px;font-family:sans-serif"><h2 style="color:#CC092F">Erro ao renderizar</h2><p style="margin-top:8px;color:#666">Abra o console (F12) para ver os detalhes.</p></div>';
+  buildNavLinks();
+  updateHeroStats();
+}
+
+function buildNavLinks(){
+  const links=[
+    {id:'devportal',label:'Developer Portal'},{id:'credito',label:'Crédito'},
+    {id:'whitelabel',label:'White Label'},{id:'run',label:'Run'},
+    {id:'fluxo',label:'Fluxo'},{id:'team',label:'Team'},
+    {id:'autonomia',label:'Autonomia'},{id:'ferramentas',label:'Ferramentas'},
+    {id:'riscos',label:'Riscos'}
+  ];
+  const customLinks=Object.keys(groups).filter(g=>!GROUP_ORDER.includes(g)).map(g=>({id:'sec-'+g.toLowerCase(),label:groups[g].name}));
+  document.getElementById('nav-links').innerHTML=[...links,...customLinks].map(l=>`<a onclick="navScroll('${l.id}')">${l.label}</a>`).join('');
+}
+
+function updateHeroStats(){
+  const total=squads.length,people=squads.reduce((a,s)=>a+s.people,0);
+  document.getElementById('hero-stats').innerHTML=`
+    <div><div class="hstat-n">${total}</div><div class="hstat-l">Squads</div></div>
+    <div><div class="hstat-n">~${people}</div><div class="hstat-l">Pessoas na Tribo</div></div>
+    <div><div class="hstat-n">${Object.keys(groups).length}</div><div class="hstat-l">Grupos</div></div>
+    <div><div class="hstat-n">${members.length}</div><div class="hstat-l">Membros cadastrados</div></div>`;
+  const nums=['Zero','Uma','Duas','Três','Quatro','Cinco','Seis','Sete','Oito','Nove','Dez',
+    'Onze','Doze','Treze','Quatorze','Quinze','Dezesseis','Dezessete','Dezoito','Dezenove','Vinte'];
+  const el=document.getElementById('hero-squad-count');
+  if(el) el.textContent=nums[total]||total;
+}
+
+// ═══ TOGGLE CARD (scrollHeight — nunca corta) ═══
+function toggleCard(el){
+  const d=el.nextElementSibling;if(!d) return;
+  const open=d.style.maxHeight&&d.style.maxHeight!=='0px';
+  d.style.maxHeight=open?'0':(d.scrollHeight+'px');
+  el.querySelector('span').textContent=open?'▾':'▴';
+}
+
+// ═══ FLOW ═══
+function flowClick(id){
+  const svg=document.getElementById('flow-svg');if(!svg) return;
+  const n=svg.querySelector(`.flow-node[data-id="${id}"]`);
+  const active=n&&n.classList.contains('active');
+  svg.querySelectorAll('.flow-node').forEach(x=>x.classList.remove('active'));
+  svg.querySelectorAll('.flow-arrow').forEach(x=>x.classList.remove('dimmed','hi'));
+  const info=document.getElementById('flow-info');
+  if(active){info.classList.remove('show');return;}
+  if(n) n.classList.add('active');
+  svg.querySelectorAll('.flow-arrow').forEach(a=>{
+    const rel=a.dataset.f===id||a.dataset.t===id;
+    a.classList.toggle('dimmed',!rel);a.classList.toggle('hi',rel);
+  });
+  const sq=squads.find(s=>s.id===id);
+  const provides=['B5→B1','B5→B2','B6→B3','B6→B4','B1→A2','B3→C1','A1→C1','C1→C2'].filter(c=>c.startsWith(id+'')).join(', ');
+  const consumes=['B5→B1','B5→B2','B6→B3','B6→B4','B1→A2','B3→C1','A1→C1','C1→C2'].filter(c=>c.endsWith('→'+id)).join(', ');
+  if(info) {info.innerHTML=`<b style="color:var(--ink)">${id} · ${sq?.name||''}</b><br>${provides?'<br><b>Fornece:</b> '+provides.replace(/→/g,' → '):''}${consumes?'<br><b>Consome de:</b> '+consumes.replace(/→/g,' ← '):''}`;info.classList.add('show');}
+}
+
+// ═══ TEAM MEMBERS ═══
+function toggleMember(id){
+  const card=document.getElementById('mc-'+id);if(!card) return;
+  const wasActive=card.classList.contains('active');
+  document.querySelectorAll('.member-card').forEach(c=>c.classList.remove('active'));
+  if(!wasActive) card.classList.add('active');
+}
+
+// ═══ EDIT MODE ═══
+function toggleEditMode(){
+  editMode=!editMode;
+  document.body.classList.toggle('editing',editMode);
+  const btn=document.getElementById('edit-btn');
+  btn.textContent=editMode?'✓ Sair da edição':'✏️ Editar';
+  showToast(editMode?'Modo edição ativo':'Modo edição desativado');
+}
+
+// ═══ DELETE CONFIRMATION ═══
+function askDeleteSquad(id){
+  const sq=squads.find(s=>s.id===id);if(!sq) return;
+  pendingDeleteId=id;pendingDeleteType='squad';
+  document.getElementById('del-target-name').textContent=`"${sq.id} — ${sq.name}"`;
+  document.getElementById('del-person-name').value='';
+  document.getElementById('del-overlay').classList.add('show');
+}
+function askDeleteMember(id){
+  const m=members.find(x=>x.id===id);if(!m) return;
+  pendingDeleteId=id;pendingDeleteType='member';
+  document.getElementById('del-target-name').textContent=`"${m.name||m.role}"`;
+  document.getElementById('del-person-name').value='';
+  document.getElementById('del-overlay').classList.add('show');
+}
+function askDelete(){askDeleteSquad(editingSquadId);}
+function closeDelModal(){document.getElementById('del-overlay').classList.remove('show');pendingDeleteId=null;}
+function executeDelete(){
+  const name=document.getElementById('del-person-name').value.trim();
+  if(!name){showToast('⚠️ Informe seu nome para confirmar a exclusão.');return;}
+  if(pendingDeleteType==='squad'){
+    squads=squads.filter(s=>s.id!==pendingDeleteId);
+    persist();closeSquadModal();
+  } else if(pendingDeleteType==='member'){
+    members=members.filter(m=>m.id!==pendingDeleteId);
+    persist();closeMemberModal();
+  }
+  closeDelModal();renderAll();showToast(`Excluído por ${name} ✓`);
+}
+
+// ═══ SQUAD MODAL ═══
+function populateGroupSelect(){
+  const sel=document.getElementById('f-group');
+  sel.innerHTML=Object.entries(groups).map(([id,m])=>`<option value="${id}">${id} — ${m.name}</option>`).join('');
+}
+function closeSquadModal(){document.getElementById('squad-overlay').classList.remove('show');}
+function saveSquadModal(){
+  const toL=v=>v.split('\n').map(s=>s.trim()).filter(Boolean);
+  const id=(editingSquadId||document.getElementById('f-id').value.trim().toUpperCase());
+  if(!id){showToast('⚠️ Informe o ID da squad.');return;}
+  const data={id,
+    group:document.getElementById('f-group').value,
+    name:document.getElementById('f-name').value.trim(),
+    mandate:document.getElementById('f-mandate').value.trim(),
+    methodology:document.getElementById('f-method').value,
+    people:parseInt(document.getElementById('f-people').value)||8,
+    capabilities:toL(document.getElementById('f-caps').value),
+    scopeLabel:document.getElementById('f-scope-label').value.trim()||'Escopo',
+    scope:toL(document.getElementById('f-scope').value),
+    profiles:document.getElementById('f-profiles').value.trim(),
+    risks:toL(document.getElementById('f-risks').value),
+    premises:toL(document.getElementById('f-premises').value),
+    dependencies:getSelectedDeps()};
+  if(editingSquadId){const i=squads.findIndex(s=>s.id===editingSquadId);if(i>=0)squads[i]=data;}
+  else{if(squads.find(s=>s.id===id)){showToast('⚠️ Já existe squad com este ID.');return;}squads.push(data);}
+  persist();closeSquadModal();renderAll();
+}
+function filterDeps(q){const wrap=document.getElementById('dep-select-wrap');if(!wrap)return;const lq=(q||'').toLowerCase();wrap.querySelectorAll('.dep-check-item').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(lq)||!lq?'':'none';});}
+function getSelectedDeps(){const wrap=document.getElementById('dep-select-wrap');if(!wrap)return[];return[...wrap.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.value);}
+function filterDeps(q){const wrap=document.getElementById('dep-select-wrap');if(!wrap)return;const q2=(q||'').toLowerCase();wrap.querySelectorAll('.dep-check-item').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(q2)||!q2?'':'none';});}
+function openGroupModal(){
+  editingGroupId=null;
+  document.getElementById('g-id').value='';
+  document.getElementById('g-id').disabled=false;
+  document.getElementById('g-name').value='';
+  document.getElementById('g-desc').value='';
+  document.getElementById('g-method').value='Scrum';
+  document.querySelectorAll('.color-swatch').forEach((s,i)=>s.classList.toggle('selected',i===0));
+  selectedGroupColor={color:'#CC092F',faint:'#FBE9EC'};
+  const delBtn=document.getElementById('g-del-btn');
+  const saveBtn=document.getElementById('g-save-btn');
+  if(delBtn) delBtn.style.display='none';
+  if(saveBtn) saveBtn.textContent='Criar Grupo';
+  document.getElementById('group-overlay').classList.add('show');
+}
+function openGroupEdit(id){
+  const m=groups[id];if(!m) return;
+  editingGroupId=id;
+  document.getElementById('g-id').value=id;
+  document.getElementById('g-id').disabled=true;
+  document.getElementById('g-name').value=m.name||'';
+  document.getElementById('g-desc').value=m.desc||'';
+  document.getElementById('g-method').value=m.methodology||'Scrum';
+  document.querySelectorAll('.color-swatch').forEach(s=>{
+    const match=s.dataset.color===m.color;
+    s.classList.toggle('selected',match);
+    if(match) selectedGroupColor={color:s.dataset.color,faint:s.dataset.faint||s.dataset.color+'22'};
+  });
+  const delBtn=document.getElementById('g-del-btn');
+  const saveBtn=document.getElementById('g-save-btn');
+  if(delBtn) delBtn.style.display='block';
+  if(saveBtn) saveBtn.textContent='Salvar alterações';
+  document.getElementById('group-overlay').classList.add('show');
+}
+function closeGroupModal(){
+  document.getElementById('group-overlay').classList.remove('show');
+  editingGroupId=null;
+}
+function deleteGroup(){
+  if(!editingGroupId) return;
+  const m=groups[editingGroupId];
+  const nome=prompt('Para excluir o grupo "'+m.name+'", digite seu nome completo:');
+  if(!nome||!nome.trim()){showToast('Exclusão cancelada.');return;}
+  const squadsNoGrupo=squads.filter(s=>s.group===editingGroupId);
+  if(squadsNoGrupo.length>0){
+    if(!confirm('O grupo "'+m.name+'" tem '+squadsNoGrupo.length+' squad(s). Excluir o grupo também excluirá essas squads. Continuar?')) return;
+    squads=squads.filter(s=>s.group!==editingGroupId);
+  }
+  delete groups[editingGroupId];
+  persist();closeGroupModal();renderAll();
+  showToast('Grupo excluído por '+nome.trim()+' ✓');
+}
+function selectColor(el){
+  document.querySelectorAll('.color-swatch').forEach(s=>s.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGroupColor={color:el.dataset.color,faint:el.dataset.faint};
+}
+function saveGroupModal(){
+  const id=editingGroupId||document.getElementById('g-id').value.trim().toUpperCase();
+  const name=document.getElementById('g-name').value.trim();
+  if(!id||!name){showToast('⚠️ Informe ID e Nome do grupo.');return;}
+  if(!editingGroupId&&groups[id]){showToast('⚠️ Já existe grupo com este ID.');return;}
+  groups[id]={name,
+    color:selectedGroupColor.color,
+    faint:selectedGroupColor.faint||selectedGroupColor.color+'22',
+    desc:document.getElementById('g-desc').value.trim(),
+    methodology:document.getElementById('g-method').value};
+  persist();closeGroupModal();renderAll();
+  showToast(editingGroupId?`Grupo ${id} atualizado ✓`:`Grupo ${id} criado!`);
+}
+
+// ═══ MEMBER MODAL ═══
+function populateMemberSquadSelect(){
+  const sel=document.getElementById('m-squad');
+  sel.innerHTML='<option value="">— Nenhuma específica —</option>'+squads.map(s=>`<option value="${s.id}">${s.id} — ${s.name}</option>`).join('');
+}
+function openMemberEdit(id){
+  const m=members.find(x=>x.id===id);if(!m) return;
+  editingMemberId=id;
+  document.getElementById('member-modal-title').textContent='Editar Membro';
+  document.getElementById('m-name').value=m.name;
+  document.getElementById('m-role').value=m.role;
+  document.getElementById('m-title').value=m.title;
+  document.getElementById('m-area').value=m.area||'';
+  populateMemberSquadSelect();document.getElementById('m-squad').value=m.squadId||'';
+  document.getElementById('m-del-btn').style.display='block';
+  document.getElementById('member-overlay').classList.add('show');
+}
+function openMemberAdd(){
+  editingMemberId=null;
+  document.getElementById('member-modal-title').textContent='Adicionar Membro';
+  ['m-name','m-title','m-area'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-role').value='TL';
+  populateMemberSquadSelect();document.getElementById('m-squad').value='';
+  document.getElementById('m-del-btn').style.display='none';
+  document.getElementById('member-overlay').classList.add('show');
+}
+function closeMemberModal(){document.getElementById('member-overlay').classList.remove('show');}
+function saveMemberModal(){
+  const data={id:editingMemberId||('m'+Date.now()),
+    name:document.getElementById('m-name').value.trim(),
+    role:document.getElementById('m-role').value,
+    title:document.getElementById('m-title').value.trim(),
+    area:document.getElementById('m-area').value.trim(),
+    squadId:document.getElementById('m-squad').value};
+  if(editingMemberId){const i=members.findIndex(m=>m.id===editingMemberId);if(i>=0)members[i]=data;}
+  else{members.push(data);}
+  persist();closeMemberModal();renderAll();
+}
+
+// ═══ ADD GROUP BUTTON (global) ═══
+function openGroupModalFromNav(){openGroupModal();}
+
+// ═══ UTILS ═══
+function navScroll(id){
+  const el=document.getElementById(id);if(!el) return;
+  const nav=document.querySelector('.nav');
+  const top=el.getBoundingClientRect().top+window.pageYOffset-(nav?nav.offsetHeight:56)-16;
+  window.scrollTo({top,behavior:'smooth'});
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2600);
+}
+// Close modals clicking outside
+['del-overlay','squad-overlay','group-overlay','member-overlay','dep-catalog-overlay','risk-overlay','strategic-overlay','tool-overlay','extdep-overlay'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');});
+});
+
+// ═══ INIT ═══
+async function init(){
+  // Inicializa IndexedDB como cache local
+  try{await initDB();}catch(e){}
+  // Dados padrão como fallback
+  squads=DEFAULT_SQUADS.map(s=>({...s}));
+  groups=Object.assign({},DEFAULT_GROUPS);
+  members=DEFAULT_MEMBERS.map(m=>({...m}));
+  depCatalog=DEFAULT_DEPCATALOG.map(d=>({...d}));
+  tools=DEFAULT_TOOLS.map(t=>({...t}));
+  risks=DEFAULT_RISKS.map(r=>({...r}));
+  strategicCards=DEFAULT_STRATEGIC.map(s=>({...s}));
+  externalDeps=DEFAULT_EXTERNALDEPS.map(e=>({...e}));
+  const user=sessionStorage.getItem('baas_user');
+  if(user){
+    currentUser=user;
+    // Tenta reconectar ao Firebase e carregar dados atualizados
+    try{
+      if(isFBReady()){
+        await fbSignInAnonymous();
+        const state=await fbGet('state').catch(()=>null);
+        if(state&&state.squads){
+          squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
+          groups=state.groups||Object.assign({},DEFAULT_GROUPS);
+          members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
+          const _nA=v=>Array.isArray(v)?v:Object.values(v||{}).filter(Boolean);
+          if(state.depCatalog) depCatalog=_nA(state.depCatalog);
+          if(state.risks) risks=_nA(state.risks);
+          if(state.strategicCards) strategicCards=_nA(state.strategicCards);
+          if(state.externalDeps) externalDeps=_nA(state.externalDeps);
+          if(state.tools) tools=_nA(state.tools);
+        }
+        // Migrar dados antigos de externalDeps → depCatalog (uma vez)
+        if(migrateExternalDepsToCalog()) await persist();
+        lastSyncAt=new Date();
+        startSSE();
+      } else {
+        // Sem Firebase → carrega do cache IndexedDB
+        const state=await dbGet('state').catch(()=>null);
+        if(state&&state.squads){
+          squads=Array.isArray(state.squads)?state.squads:Object.values(state.squads);
+          groups=state.groups||Object.assign({},DEFAULT_GROUPS);
+          members=Array.isArray(state.members)?state.members:Object.values(state.members||{});
+          const _nA=v=>Array.isArray(v)?v:Object.values(v||{}).filter(Boolean);
+          if(state.depCatalog) depCatalog=_nA(state.depCatalog);
+          if(state.risks) risks=_nA(state.risks);
+          if(state.strategicCards) strategicCards=_nA(state.strategicCards);
+          if(state.externalDeps) externalDeps=_nA(state.externalDeps);
+          if(state.tools) tools=_nA(state.tools);
+        }
+      }
+    }catch(e){ console.warn('Reconnect error:',e); }
+    document.getElementById('login-overlay').style.display='none';
+    document.getElementById('main-nav').style.display='';
+    document.getElementById('main-content').style.display='';
+    document.getElementById('nav-user-email').textContent=user;
+    document.getElementById('footer-user').textContent=user;
+    renderAll();updateSyncBadge();
+  }
+}
+
+
+// ═══ RENDER STRATEGIC ═══════════════════════════════════════════════
+function renderStrategic(){
+  const editBtns=(id)=>`<div class="strategic-edit-btns">
+    <button class="btn-strategic-edit" onclick="openStrategicEdit('${id}')">✏️</button>
+    <button class="btn-strategic-del" onclick="askDeleteStrategic('${id}')">✕</button>
+  </div>`;
+  const cards=(strategicCards||DEFAULT_STRATEGIC).map(s=>{
+    const bItems=(s.before.items||[]).map(i=>`<li>${i}</li>`).join('');
+    const aItems=(s.after.items||[]).map(i=>`<li>${i}</li>`).join('');
+    return `<div class="autonomy-block-wrap">
+      ${editBtns(s.id)}
+      <div class="autonomy-block">
+        <div class="autonomy-eyebrow">${s.eyebrow||''}</div>
+        <h3>${s.title}</h3>
+        <p>${s.description||''}</p>
+        <div class="autonomy-compare">
+          <div class="autonomy-col before"><div class="autonomy-col-label">${s.before.label}</div><ul>${bItems}</ul></div>
+          <div class="autonomy-col after"><div class="autonomy-col-label">${s.after.label}</div><ul>${aItems}</ul></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="section" id="autonomia" style="scroll-margin-top:72px">
+    <div class="section-head">
+      <div class="section-head-left"><div class="seyebrow">Argumento estratégico</div><h2>Autonomia frente ao vendor atual</h2></div>
+      <button class="strategic-add-btn" onclick="openStrategicAdd()">＋ Novo argumento</button>
+    </div>
+    ${cards}
+  </div>`;
+}
+
+// ═══ RENDER TOOLS ════════════════════════════════════════════════════
+function renderTools(){
+  const tData=tools&&tools.length?tools:DEFAULT_TOOLS;
+  const groupColors={A:'#CC092F',B:'#4F46E5',C:'#1A8754',R:'#0EA5E9'};
+  const groupFaint={A:'#FBE9EC',B:'#EEEDFC',C:'#E8F5EE',R:'#E0F2FE'};
+  const rows=tData.map(t=>{
+    const g=(t.squad||'').charAt(0);const gc=groupColors[g]||'#6B6F80';const gf=groupFaint[g]||'#F0F0F0';
+    return `<tr>
+      <td><b>${t.layer}</b></td>
+      <td>${t.tool}</td>
+      <td><span class="tool-badge" style="background:${gf};color:${gc}">${t.squad}</span></td>
+      <td>${t.purpose}
+        <div class="tool-edit-btns" style="margin-top:4px">
+          <button class="btn-edit" onclick="openToolEdit('${t.id}')">✏️</button>
+          <button class="btn-del" onclick="deleteTool('${t.id}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<div class="section" id="ferramentas" style="scroll-margin-top:72px">
+    <div class="section-head">
+      <div class="section-head-left"><div class="seyebrow">Stack recomendada</div><h2>Ferramentas e pré-requisitos</h2></div>
+    </div>
+    <table class="tools-table">
+      <thead><tr><th>Camada</th><th>Ferramenta</th><th>Squad</th><th>Para quê</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <button class="tools-add-btn" onclick="openToolAdd()">＋ Adicionar ferramenta</button>
+  </div>`;
+}
+
+// ═══ RENDER RISKS ════════════════════════════════════════════════════
+function riskScore(prob,impact){
+  const pm={alta:3,media:2,baixa:1};const im={alto:3,medio:2,baixo:1};
+  const s=(pm[prob]||1)*(im[impact]||1);
+  if(s>=6) return {label:'Crítico',cls:'score-critico'};
+  if(s>=4) return {label:'Alto',cls:'score-alto'};
+  if(s>=2) return {label:'Médio',cls:'score-medio'};
+  return {label:'Baixo',cls:'score-baixo'};
+}
+function renderRisks(){
+  const rData=risks&&risks.length?risks:DEFAULT_RISKS;
+  const probLabel={alta:'Alta prob.',media:'Média prob.',baixa:'Baixa prob.'};
+  const impLabel={alto:'Alto impacto',medio:'Médio impacto',baixo:'Baixo impacto'};
+  const probCls={alta:'prob-alta',media:'prob-media',baixa:'prob-baixa'};
+  const impCls={alto:'imp-alto',medio:'imp-medio',baixo:'imp-baixo'};
+  const statusCls={aberto:'status-aberto',mitigado:'status-mitigado',aceito:'status-aceito'};
+  const cards=rData.map(r=>{
+    const score=riskScore(r.probability,r.impact);
+    const mits=(r.mitigations||[]).map(m=>`<li>${m}</li>`).join('');
+    const dl=r.deadline?new Date(r.deadline).toLocaleDateString('pt-BR',{month:'short',year:'numeric'}):'—';
+    return `<div class="risk-card-v2" style="border-left:3px solid ${score.cls==='score-critico'?'#991B1B':score.cls==='score-alto'?'#DC2626':score.cls==='score-medio'?'#D97706':'#059669'}">
+      <div class="risk-edit-btns">
+        <button class="btn-edit" onclick="openRiskEdit('${r.id}')">✏️</button>
+      </div>
+      <div class="risk-header-v2">
+        <div class="risk-badges">
+          <span class="risk-badge ${probCls[r.probability]||'prob-media'}">${probLabel[r.probability]||r.probability}</span>
+          <span class="risk-badge ${impCls[r.impact]||'imp-medio'}">${impLabel[r.impact]||r.impact}</span>
+          <span class="risk-score-badge ${score.cls}">🎯 ${score.label}</span>
+        </div>
+        <span class="risk-cat-badge">${r.category||''}</span>
+      </div>
+      <h4>${r.title}</h4>
+      <div class="risk-desc">${r.description}</div>
+      ${mits?`<div class="risk-mitigations"><b>Ações mitigatórias</b><ul>${mits}</ul></div>`:''}
+      <div class="risk-footer-v2">
+        <span>👤 ${r.owner||'—'}</span>
+        <span>📅 ${dl}</span>
+        <span class="risk-status-badge ${statusCls[r.status]||'status-aberto'}">${r.status||'aberto'}</span>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="section" id="riscos" style="scroll-margin-top:72px">
+    <div class="section-head">
+      <div class="section-head-left"><div class="seyebrow">Atenção da tribo</div><h2>Riscos transversais</h2><p>Riscos que afetam mais de um grupo. Score = Probabilidade × Impacto.</p></div>
+    </div>
+    <div class="risk-grid-v2">${cards}</div>
+    <button class="add-risk-btn" onclick="openRiskAdd()">＋ Adicionar risco</button>
+  </div>`;
+}
+
+// ═══ RENDER FLOW (with tabs for internal/external) ════════════════════
+function renderExtDepGraph(){
+  const allExtCatalog=(depCatalog||[]).filter(d=>d.type==='externo');
+  const catalogExt=allExtCatalog.filter(d=>{
+    const sq=squads.filter(s=>(s.dependencies||[]).includes(d.id));
+    return sq.length>0;
+  });
+  if(!allExtCatalog.length){
+    return '<div style="text-align:center;padding:40px;color:var(--g400);font-size:13px">'+
+      'Nenhuma dependência externa cadastrada.<br>Use o botão 🔗 Dependências no nav para adicionar.</div>';
+  }
+  if(!catalogExt.length){
+    return '<div style="text-align:center;padding:40px;color:var(--g400);font-size:13px">'+
+      'Dependências externas cadastradas mas sem squads vinculadas.<br>'+
+      'Edite uma squad e vincule dependências em "Dependências desta squad".</div>';
+  }
+
+  const ic={alto:'#DC2626',medio:'#D97706',baixo:'#059669'};
+  const ifc={alto:'#FEE2E2',medio:'#FEF3C7',baixo:'#D1FAE5'};
+
+  // Squads à esquerda, deps à direita
+  // Collect unique squads that have any external dep
+  const sqIds=[...new Set(catalogExt.flatMap(d=>
+    squads.filter(s=>(s.dependencies||[]).includes(d.id)).map(s=>s.id)
+  ))];
+
+  const NW=170, NH=42, SW=195, SH=42;
+  const sY=i=>22+i*60;
+  const dY=i=>22+i*60;
+  const totalH=Math.max(sqIds.length*60+60, catalogExt.length*60+60, 200);
+  const W=820;
+
+  // Deps column x position
+  const depX=W-SW-10;
+  const sqX=10;
+
+  // Arrows: squad → dep
+  let defs='<defs>';
+  catalogExt.forEach((_,i)=>{
+    const color=ic[catalogExt[i].impact]||'#D97706';
+    defs+=`<marker id="em${i}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+      <path d="M0,0 L8,4 L0,8 z" fill="${color}"/></marker>`;
+  });
+  defs+='</defs>';
+
+  // Arrows: from right edge of squad → left edge of dep
+  let arrows='';
+  sqIds.forEach((sqId,si)=>{
+    const sq=squads.find(s=>s.id===sqId);
+    if(!sq) return;
+    const x1=sqX+NW, y1=sY(si)+SH/2;
+    catalogExt.forEach((dep,di)=>{
+      if(!(sq.dependencies||[]).includes(dep.id)) return;
+      const color=ic[dep.impact]||'#D97706';
+      const x2=depX, y2=dY(di)+NH/2;
+      const mx=(x1+x2)/2;
+      arrows+=`<path class="flow-arrow" data-sq="${sqId}" data-ext-dep="${dep.id}"
+        d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}"
+        fill="none" stroke="${color}" stroke-width="1.8" opacity=".55"
+        marker-end="url(#em${di})"/>`;
+    });
+  });
+
+  // Squad nodes (left)
+  let sqNodes='';
+  sqIds.forEach((sqId,i)=>{
+    const sq=squads.find(s=>s.id===sqId)||{id:sqId,name:sqId,group:'A'};
+    const gm=groups[sq.group]||DEFAULT_GROUPS[sq.group]||{color:'#6B6F80',faint:'#F0F0F0'};
+    const depCount=(sq.dependencies||[]).filter(did=>catalogExt.find(d=>d.id===did)).length;
+    sqNodes+=`<g class="flow-node" data-id="${sqId}" onclick="flowClick('${sqId}')" style="cursor:pointer">
+      <rect x="${sqX}" y="${sY(i)}" width="${NW}" height="${SH}" rx="8"
+        fill="${gm.faint}" stroke="${gm.color}" stroke-width="1.5"/>
+      <text x="${sqX+NW/2}" y="${sY(i)+SH/2-5}" text-anchor="middle"
+        font-family="var(--mono)" font-size="10" font-weight="700" fill="#14161F">${sq.id}</text>
+      <text x="${sqX+NW/2}" y="${sY(i)+SH/2+9}" text-anchor="middle"
+        font-family="var(--sans)" font-size="9" fill="#6B6F80">${(sq.name||'').substring(0,20)}</text>
+      <rect x="${sqX+NW-22}" y="${sY(i)+2}" width="20" height="16" rx="4"
+        fill="${gm.color}" opacity=".9"/>
+      <text x="${sqX+NW-12}" y="${sY(i)+13}" text-anchor="middle"
+        font-family="var(--mono)" font-size="8.5" font-weight="700" fill="white">${depCount}</text>
+    </g>`;
+  });
+
+  // Dep nodes (right) with squad count badge
+  let depNodes='';
+  catalogExt.forEach((dep,i)=>{
+    const color=ic[dep.impact]||'#D97706';
+    const faint=ifc[dep.impact]||'#FEF3C7';
+    const sqCount=squads.filter(s=>(s.dependencies||[]).includes(dep.id)).length;
+    depNodes+=`<g class="flow-node ext-dep-node" data-dep-id="${dep.id}"
+      onclick="highlightExtDep('${dep.id}')" style="cursor:pointer">
+      <rect x="${depX}" y="${dY(i)}" width="${SW}" height="${NH}" rx="8"
+        fill="${faint}" stroke="${color}" stroke-width="1.5"/>
+      <text x="${depX+SW/2-14}" y="${dY(i)+NH/2-5}" text-anchor="middle"
+        font-family="var(--sans)" font-size="10.5" font-weight="700" fill="#14161F">
+        ${dep.name.substring(0,22)}</text>
+      <text x="${depX+SW/2-14}" y="${dY(i)+NH/2+9}" text-anchor="middle"
+        font-family="var(--sans)" font-size="9" fill="#6B6F80">${dep.category||''}</text>
+      <rect x="${depX+SW-28}" y="${dY(i)+2}" width="26" height="16" rx="4"
+        fill="${color}" opacity=".85"/>
+      <text x="${depX+SW-15}" y="${dY(i)+13}" text-anchor="middle"
+        font-family="var(--mono)" font-size="8.5" font-weight="700" fill="white">${sqCount} sq</text>
+    </g>`;
+  });
+
+  // Column headers
+  const hdrs=`
+    <text x="${sqX+NW/2}" y="14" text-anchor="middle"
+      font-family="var(--sans)" font-size="9" font-weight="700" fill="#9CA3AF"
+      letter-spacing=".06em">SQUADS</text>
+    <text x="${depX+SW/2}" y="14" text-anchor="middle"
+      font-family="var(--sans)" font-size="9" font-weight="700" fill="#9CA3AF"
+      letter-spacing=".06em">DEPENDÊNCIAS EXTERNAS</text>`;
+
+  return `<svg viewBox="0 0 ${W} ${totalH}" style="width:100%;height:auto" id="ext-dep-svg">
+    ${defs}${hdrs}${arrows}${sqNodes}${depNodes}
+  </svg>`;
+}
+
+function highlightExtDep(id){
+  const svg=document.getElementById('ext-dep-svg');if(!svg)return;
+  const isActive=svg.querySelector('[data-dep-id="'+id+'"].active');
+  svg.querySelectorAll('.flow-arrow').forEach(a=>a.classList.remove('dimmed','hi'));
+  svg.querySelectorAll('[data-dep-id]').forEach(n=>n.classList.remove('active'));
+  svg.querySelectorAll('[data-id]').forEach(n=>n.classList.remove('active'));
+  if(isActive)return;
+  svg.querySelectorAll('[data-dep-id="'+id+'"]').forEach(n=>n.classList.add('active'));
+  // Highlight all squads connected to this dep
+  svg.querySelectorAll('.flow-arrow').forEach(a=>{
+    const rel=a.dataset.extDep===id;
+    if(rel) svg.querySelectorAll('[data-id="'+a.dataset.sq+'"]').forEach(n=>n.classList.add('active'));
+    a.classList.toggle('dimmed',!rel);a.classList.toggle('hi',rel);
+  });
+}
+function renderFlowSection(){
+  const extRows=(externalDeps||DEFAULT_EXTERNALDEPS).map(e=>{
+    const impCls={alto:'imp-alto-badge',medio:'imp-medio-badge',baixo:'imp-baixo-badge'};
+    const squadsStr=(e.squads||[]).join(', ');
+    return `<tr>
+      <td><b>${e.name}</b><br><span style="font-size:11px;color:var(--g400)">${e.category}</span></td>
+      <td><span class="impact-badge ${impCls[e.impact]||'imp-medio-badge'}">${e.impact}</span></td>
+      <td style="font-size:12.5px;color:var(--g700)">${e.description}</td>
+      <td><div style="display:flex;flex-wrap:wrap;gap:3px">${squadsStr.split(',').map(s=>s.trim()).filter(Boolean).map(s=>`<span class="dep-tag dep-interno">${s}</span>`).join('')}</div>
+        <div class="tool-edit-btns" style="margin-top:4px">
+          <button class="btn-edit" onclick="openExtDepEdit('${e.id}')">✏️</button>
+          <button class="btn-del" onclick="deleteExtDep('${e.id}')">✕</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  return `<div class="section" id="fluxo" style="scroll-margin-top:72px">
+    <div class="section-head"><div class="section-head-left"><div class="seyebrow">Dependências</div><h2>Fluxo de dependências</h2><p>Visão interna (squad a squad) e visão externa (entidades fora do controle da tribo).</p></div></div>
+    <div class="flow-wrap">
+      <div class="flow-tabs">
+        <button class="flow-tab active" onclick="switchFlowTab(this,'flow-internal')">🔵 Visão Interna</button>
+        <button class="flow-tab" onclick="switchFlowTab(this,'flow-external')">🔴 Dependências Externas</button>
+      </div>
+      <div class="flow-view active" id="flow-internal">
+        <div class="flow-container">${renderFlow()}</div>
+        <div class="flow-legend">
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#4F46E5"></div>Motor B5/B6 → produtos</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#CC092F"></div>Specs → documentação</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#1A8754"></div>Produto → White Label</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#7C3AED"></div>Auth platform</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#0EA5E9;opacity:.5"></div>Build → Run</div>
+        </div>
+        <div class="flow-info" id="flow-info"></div>
+      </div>
+      <div class="flow-view" id="flow-external">
+        <div style="overflow-x:auto">${renderExtDepGraph()}</div>
+        <div class="flow-legend" style="margin-top:12px">
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#DC2626"></div>Impacto Alto</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#D97706"></div>Impacto Médio</div>
+          <div class="flow-legend-item"><div class="flow-legend-line" style="background:#059669"></div>Impacto Baixo</div>
+        </div>
+        <button class="ext-add-btn" onclick="openExtDepAdd()">+ Adicionar dependência externa</button>
+      </div>
+    </div>
+  </div>`;
+}
+function switchFlowTab(btn,viewId){
+  btn.closest('.flow-wrap').querySelectorAll('.flow-tab').forEach(t=>t.classList.remove('active'));
+  btn.closest('.flow-wrap').querySelectorAll('.flow-view').forEach(v=>v.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(viewId).classList.add('active');
+}
+
+// ═══ DEP SELECT (in squad modal) ═════════════════════════════════════
+function populateDepSelect(selectedIds){
+  const wrap=document.getElementById('dep-select-wrap');
+  if(!wrap) return;
+  const cats=[...new Set((depCatalog||[]).map(d=>d.category))];
+  wrap.innerHTML=cats.map(cat=>{
+    const items=(depCatalog||[]).filter(d=>d.category===cat).map(d=>
+      `<label class="dep-check-item">
+        <input type="checkbox" value="${d.id}" ${(selectedIds||[]).includes(d.id)?'checked':''}>
+        <span>${d.name}</span>
+        <span style="margin-left:auto;font-size:10px;color:var(--g400)">${d.type}</span>
+      </label>`).join('');
+    return `<div class="dep-cat-label">${cat}</div>${items}`;
+  }).join('');
+}
+function filterDepSelect(q){
+  const wrap=document.getElementById('dep-select-wrap');
+  if(!wrap) return;
+  const items=wrap.querySelectorAll('.dep-check-item');
+  const labels=wrap.querySelectorAll('.dep-cat-label');
+  const lq=q.toLowerCase();
+  items.forEach(item=>{item.style.display=item.textContent.toLowerCase().includes(lq)?'':'none';});
+  labels.forEach(label=>{
+    const cat=label.nextSibling;let hasVisible=false;
+    let el=label.nextElementSibling;
+    while(el&&el.classList.contains('dep-check-item')){if(el.style.display!=='none')hasVisible=true;el=el.nextElementSibling;}
+    label.style.display=hasVisible?'':'none';
+  });
+}
+function getSelectedDeps(){
+  const wrap=document.getElementById('dep-select-wrap');
+  if(!wrap) return [];
+  return [...wrap.querySelectorAll('input[type=checkbox]:checked')].map(cb=>cb.value);
+}
+
+// ═══ DEP CATALOG CRUD ════════════════════════════════════════════════
+function openDepCatalog(){
+  renderDepCatalogList();
+  document.getElementById('dep-catalog-overlay').classList.add('show');
+}
+function closeDepCatalog(){
+  document.getElementById('dep-catalog-overlay').classList.remove('show');
+  // Refresh squad modal dep select if it's open
+  const _so=document.getElementById('squad-overlay');
+  if(_so&&_so.classList.contains('show')){
+    const _sel=getSelectedDeps();populateDepSelect(_sel);
+  }
+}
+function renderDepCatalogList(){
+  const list=document.getElementById('dep-catalog-list');
+  if(!list) return;
+  list.innerHTML=(depCatalog||[]).map(d=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:7px;background:var(--g100);margin-bottom:6px">
+      <span class="dep-tag dep-${d.type}" style="flex-shrink:0">${d.type}</span>
+      <span style="font-size:13px;font-weight:600;color:var(--ink)">${d.name}</span>
+      <span style="font-size:11px;color:var(--g400)">${d.category}</span>
+      ${d.type==='externo'&&d.impact?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;background:${d.impact==='alto'?'#FEE2E2':d.impact==='medio'?'#FEF3C7':'#D1FAE5'};color:${d.impact==='alto'?'#991B1B':d.impact==='medio'?'#92400E':'#065F46'}">${d.impact}</span>`:''}
+      <button onclick="removeDepFromCatalog('${d.id}')" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#EF4444;font-weight:700">✕</button>
+    </div>`).join('')||'<div style="font-size:13px;color:var(--g400);padding:8px">Nenhuma dependência cadastrada.</div>';
+}
+function addDepToCatalog(){
+  const name=document.getElementById('dep-new-name').value.trim();
+  const cat=document.getElementById('dep-new-cat').value.trim();
+  const type=document.getElementById('dep-new-type').value;
+  if(!name||!cat){showToast('⚠️ Informe nome e categoria.');return;}
+  const impEl=document.getElementById('dep-new-impact');
+  const impact=impEl?impEl.value:'medio';
+  depCatalog.push({id:'d'+Date.now(),name,category:cat,type,impact});
+  persist();renderDepCatalogList();renderAll();
+  document.getElementById('dep-new-name').value='';
+  document.getElementById('dep-new-cat').value='';
+  showToast('Dependência adicionada ✓');
+}
+async function removeDepFromCatalog(id){
+  depCatalog=depCatalog.filter(d=>d.id!==id);
+  // Remove dep ID from all squads that reference it
+  squads=squads.map(sq=>({...sq,
+    dependencies:(sq.dependencies||[]).filter(did=>did!==id)
+  }));
+  // Await persist so Firebase confirms write before SSE can restore old data
+  await persist();
+  renderDepCatalogList();renderAll();
+  showToast('Dependência removida ✓');
+}
+
+// ═══ SQUAD MODAL — save deps ══════════════════════════════════════════
+
+// ═══ RISK CRUD ════════════════════════════════════════════════════════
+function openRiskAdd(){
+  editingRiskId=null;
+  ['r-title','r-desc','r-owner'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('r-prob').value='media';
+  document.getElementById('r-impact').value='medio';
+  document.getElementById('r-cat').value='Técnico';
+  document.getElementById('r-status').value='aberto';
+  document.getElementById('r-deadline').value='';
+  document.getElementById('r-mitigations').value='';
+  document.getElementById('r-del-btn').style.display='none';
+  document.getElementById('risk-modal-title').textContent='Novo Risco';
+  document.getElementById('risk-overlay').classList.add('show');
+}
+function openRiskEdit(id){
+  const r=risks.find(x=>x.id===id)||(DEFAULT_RISKS.find(x=>x.id===id));
+  if(!r) return;
+  editingRiskId=id;
+  document.getElementById('r-title').value=r.title||'';
+  document.getElementById('r-desc').value=r.description||'';
+  document.getElementById('r-prob').value=r.probability||'media';
+  document.getElementById('r-impact').value=r.impact||'medio';
+  document.getElementById('r-cat').value=r.category||'Técnico';
+  document.getElementById('r-owner').value=r.owner||'';
+  document.getElementById('r-deadline').value=r.deadline||'';
+  document.getElementById('r-status').value=r.status||'aberto';
+  document.getElementById('r-mitigations').value=(r.mitigations||[]).join('\n');
+  document.getElementById('r-del-btn').style.display='block';
+  document.getElementById('risk-modal-title').textContent='Editar Risco';
+  document.getElementById('risk-overlay').classList.add('show');
+}
+function closeRiskModal(){document.getElementById('risk-overlay').classList.remove('show');editingRiskId=null;}
+function saveRiskModal(){
+  const toL=v=>v.split('\n').map(s=>s.trim()).filter(Boolean);
+  const data={id:editingRiskId||('r'+Date.now()),
+    title:document.getElementById('r-title').value.trim(),
+    description:document.getElementById('r-desc').value.trim(),
+    probability:document.getElementById('r-prob').value,
+    impact:document.getElementById('r-impact').value,
+    category:document.getElementById('r-cat').value,
+    owner:document.getElementById('r-owner').value.trim(),
+    deadline:document.getElementById('r-deadline').value,
+    status:document.getElementById('r-status').value,
+    mitigations:toL(document.getElementById('r-mitigations').value)};
+  if(!data.title){showToast('⚠️ Informe o título do risco.');return;}
+  if(editingRiskId){const i=risks.findIndex(x=>x.id===editingRiskId);if(i>=0)risks[i]=data;else risks.push(data);}
+  else risks.push(data);
+  persist();closeRiskModal();renderAll();
+}
+function deleteRisk(id){
+  const rid=id||editingRiskId;if(!rid) return;
+  risks=risks.filter(x=>x.id!==rid);
+  persist();closeRiskModal();renderAll();showToast('Risco removido ✓');
+}
+
+// ═══ TOOL CRUD ═══════════════════════════════════════════════════════
+function openToolAdd(){
+  editingToolId=null;
+  ['t-layer','t-tool','t-squad','t-purpose'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('t-del-btn').style.display='none';
+  document.getElementById('tool-modal-title').textContent='Nova Ferramenta';
+  document.getElementById('tool-overlay').classList.add('show');
+}
+function openToolEdit(id){
+  const t=tools.find(x=>x.id===id);if(!t) return;
+  editingToolId=id;
+  document.getElementById('t-layer').value=t.layer||'';
+  document.getElementById('t-tool').value=t.tool||'';
+  document.getElementById('t-squad').value=t.squad||'';
+  document.getElementById('t-purpose').value=t.purpose||'';
+  document.getElementById('t-del-btn').style.display='block';
+  document.getElementById('tool-modal-title').textContent='Editar Ferramenta';
+  document.getElementById('tool-overlay').classList.add('show');
+}
+function closeToolModal(){document.getElementById('tool-overlay').classList.remove('show');editingToolId=null;}
+function saveToolModal(){
+  const data={id:editingToolId||('t'+Date.now()),
+    layer:document.getElementById('t-layer').value.trim(),
+    tool:document.getElementById('t-tool').value.trim(),
+    squad:document.getElementById('t-squad').value.trim(),
+    purpose:document.getElementById('t-purpose').value.trim()};
+  if(!data.layer||!data.tool){showToast('⚠️ Informe camada e ferramenta.');return;}
+  if(editingToolId){const i=tools.findIndex(x=>x.id===editingToolId);if(i>=0)tools[i]=data;else tools.push(data);}
+  else tools.push(data);
+  persist();closeToolModal();renderAll();
+}
+function deleteTool(id){
+  const tid=id||editingToolId;if(!tid) return;
+  tools=tools.filter(x=>x.id!==tid);
+  persist();closeToolModal();renderAll();showToast('Ferramenta removida ✓');
+}
+
+// ═══ STRATEGIC CARD CRUD ═════════════════════════════════════════════
+function openStrategicAdd(){
+  editingStrategicId=null;
+  const _=id=>document.getElementById(id);
+  if(_('s-eyebrow'))      _('s-eyebrow').value='⚡ Argumento estratégico';
+  if(_('s-title'))        _('s-title').value='Descreva o argumento principal aqui.';
+  if(_('s-desc'))         _('s-desc').value='Contexte o problema que este argumento resolve e o impacto esperado.';
+  if(_('s-before-label')) _('s-before-label').value='Situação atual';
+  if(_('s-after-label'))  _('s-after-label').value='Com esta proposta';
+  if(_('s-before-items')) _('s-before-items').value='Ponto de dor 1\nPonto de dor 2\nPonto de dor 3';
+  if(_('s-after-items'))  _('s-after-items').value='Melhoria 1\nMelhoria 2\nMelhoria 3';
+  if(_('s-del-btn'))      _('s-del-btn').style.display='none';
+  if(_('strategic-modal-title')) _('strategic-modal-title').textContent='Novo Card Estratégico';
+  document.getElementById('strategic-overlay').classList.add('show');
+}
+function openStrategicEdit(id){
+  const s=strategicCards.find(x=>x.id===id);if(!s) return;
+  editingStrategicId=id;
+  document.getElementById('s-eyebrow').value=s.eyebrow||'';
+  document.getElementById('s-title').value=s.title||'';
+  document.getElementById('s-desc').value=s.description||'';
+  document.getElementById('s-before-label').value=s.before.label||'';
+  document.getElementById('s-after-label').value=s.after.label||'';
+  document.getElementById('s-before-items').value=(s.before.items||[]).join('\n');
+  document.getElementById('s-after-items').value=(s.after.items||[]).join('\n');
+  document.getElementById('s-del-btn').style.display='block';
+  document.getElementById('strategic-modal-title').textContent='Editar Card';
+  document.getElementById('strategic-overlay').classList.add('show');
+}
+function closeStrategicModal(){document.getElementById('strategic-overlay').classList.remove('show');editingStrategicId=null;}
+function saveStrategicModal(){
+  const toL=v=>v.split('\n').map(s=>s.trim()).filter(Boolean);
+  const data={id:editingStrategicId||('s'+Date.now()),
+    eyebrow:document.getElementById('s-eyebrow').value.trim(),
+    title:document.getElementById('s-title').value.trim(),
+    description:document.getElementById('s-desc').value.trim(),
+    before:{label:document.getElementById('s-before-label').value.trim(),items:toL(document.getElementById('s-before-items').value)},
+    after:{label:document.getElementById('s-after-label').value.trim(),items:toL(document.getElementById('s-after-items').value)}};
+  if(!data.title){showToast('⚠️ Informe o título do card.');return;}
+  if(editingStrategicId){const i=strategicCards.findIndex(x=>x.id===editingStrategicId);if(i>=0)strategicCards[i]=data;else strategicCards.push(data);}
+  else strategicCards.push(data);
+  persist();closeStrategicModal();renderAll();
+}
+function askDeleteStrategic(id){
+  editingStrategicId=id;
+  if(!confirm('Excluir este card estratégico?')) return;
+  deleteStrategicCard();
+}
+function deleteStrategicCard(){
+  const sid=editingStrategicId;if(!sid) return;
+  strategicCards=strategicCards.filter(x=>x.id!==sid);
+  persist();closeStrategicModal();renderAll();showToast('Card removido ✓');
+}
+
+// ═══ EXTERNAL DEP CRUD ═══════════════════════════════════════════════
+function openExtDepAdd(){
+  editingExtDepId=null;
+  ['ed-name','ed-cat','ed-desc','ed-squads'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('ed-impact').value='medio';
+  document.getElementById('ed-del-btn').style.display='none';
+  document.getElementById('extdep-modal-title').textContent='Nova Dependência Externa';
+  document.getElementById('extdep-overlay').classList.add('show');
+}
+function openExtDepEdit(id){
+  const e=(externalDeps||[]).find(x=>x.id===id);if(!e) return;
+  editingExtDepId=id;
+  document.getElementById('ed-name').value=e.name||'';
+  document.getElementById('ed-cat').value=e.category||'';
+  document.getElementById('ed-impact').value=e.impact||'medio';
+  document.getElementById('ed-desc').value=e.description||'';
+  document.getElementById('ed-squads').value=(e.squads||[]).join('\n');
+  document.getElementById('ed-del-btn').style.display='block';
+  document.getElementById('extdep-modal-title').textContent='Editar Dependência Externa';
+  document.getElementById('extdep-overlay').classList.add('show');
+}
+function closeExtDepModal(){document.getElementById('extdep-overlay').classList.remove('show');editingExtDepId=null;}
+function saveExtDepModal(){
+  const toL=v=>v.split('\n').map(s=>s.trim()).filter(Boolean);
+  const data={id:editingExtDepId||('ext'+Date.now()),
+    name:document.getElementById('ed-name').value.trim(),
+    category:document.getElementById('ed-cat').value.trim(),
+    impact:document.getElementById('ed-impact').value,
+    description:document.getElementById('ed-desc').value.trim(),
+    squads:toL(document.getElementById('ed-squads').value)};
+  if(!data.name){showToast('⚠️ Informe o nome.');return;}
+  if(editingExtDepId){const i=(externalDeps||[]).findIndex(x=>x.id===editingExtDepId);if(i>=0)externalDeps[i]=data;else externalDeps.push(data);}
+  else{if(!externalDeps) externalDeps=[];externalDeps.push(data);}
+  persist();closeExtDepModal();renderAll();
+}
+function deleteExtDep(id){
+  const eid=id||editingExtDepId;if(!eid) return;
+  externalDeps=(externalDeps||[]).filter(x=>x.id!==eid);
+  persist();closeExtDepModal();renderAll();showToast('Dependência removida ✓');
+}
+
+// ═══ TEMPLATE GENERATOR ══════════════════════════════════════════════
+function generateTemplate(){
+  let tmpl=document.documentElement.outerHTML;
+  // Replace credentials
+  tmpl=tmpl.replace(/AIzaSyAa3uxYyktTJC7o_CIx0RBFObWcxCPjzso/g,'SEU_API_KEY_AQUI');
+  tmpl=tmpl.replace(/realtime-database-61af7/g,'SEU_PROJECT_ID');
+  // Replace tribe name
+  tmpl=tmpl.replace(/Bradesco as a Service/g,'[NOME DA TRIBO]');
+  tmpl=tmpl.replace(/bradesco\.com\.br/g,'suaempresa.com.br');
+  // Reset to blank defaults (inject reset script)
+  const resetScript=`<script>
+    // TEMPLATE MODE — dados resetados para nova tribo
+    document.addEventListener('DOMContentLoaded',()=>{
+      squads=[];groups={};members=[];depCatalog=[];tools=[];risks=[];strategicCards=[];externalDeps=[];
+      sessionStorage.clear();
+    });
+  <\/script>`;
+  tmpl=tmpl.replace('</body>',resetScript+'</body>');
+  const blob=new Blob([tmpl],{type:'text/html'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='tribo-template.html';
+  a.click();
+  showToast('📄 Template gerado — tribo-template.html');
+}
+function openSquadEdit(id){
+  const sq=squads.find(s=>s.id===id);if(!sq)return;
+  editingSquadId=id;
+  document.getElementById('squad-modal-title').textContent='Editar Squad '+id;
+  document.getElementById('f-id').value=sq.id;document.getElementById('f-id').disabled=true;
+  populateGroupSelect();document.getElementById('f-group').value=sq.group;
+  document.getElementById('f-name').value=sq.name||'';
+  document.getElementById('f-mandate').value=sq.mandate||'';
+  document.getElementById('f-method').value=sq.methodology||'Scrum';
+  document.getElementById('f-people').value=sq.people||8;
+  document.getElementById('f-caps').value=(sq.capabilities||[]).join('\n');
+  document.getElementById('f-scope-label').value=sq.scopeLabel||'Escopo coberto hoje no protótipo';
+  document.getElementById('f-scope').value=(sq.scope||[]).join('\n');
+  document.getElementById('f-profiles').value=sq.profiles||'';
+  document.getElementById('f-risks').value=(sq.risks||[]).join('\n');
+  document.getElementById('f-premises').value=(sq.premises||[]).join('\n');
+  populateDepSelect(sq.dependencies||[]);
+  document.getElementById('f-del-btn').style.display='block';
+  document.getElementById('squad-overlay').classList.add('show');
+}
+function openSquadAdd(g){
+  editingSquadId=null;
+  document.getElementById('squad-modal-title').textContent='Adicionar Squad';
+  document.getElementById('f-id').value='';document.getElementById('f-id').disabled=false;
+  populateGroupSelect();if(g)document.getElementById('f-group').value=g;
+  ['f-name','f-mandate','f-caps','f-scope','f-profiles','f-risks','f-premises'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-method').value='Scrum';document.getElementById('f-people').value='8';
+  document.getElementById('f-scope-label').value='Escopo coberto hoje no protótipo';
+  populateDepSelect([]);
+  document.getElementById('f-del-btn').style.display='none';
+  document.getElementById('squad-overlay').classList.add('show');
+}
+
+// Add group btn in nav (edit mode)
+const _editBtn=document.getElementById('edit-btn');
+if(_editBtn) _editBtn.insertAdjacentHTML('beforebegin',
+  '<button class="btn-nav add-group-btn" onclick="openGroupModal()" title="Adicionar novo grupo">＋ Grupo</button>');
+
+init();
+</script>
+</body>
+</html>
+
